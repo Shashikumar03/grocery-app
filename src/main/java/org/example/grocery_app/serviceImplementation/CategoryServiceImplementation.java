@@ -4,6 +4,7 @@ import org.example.grocery_app.dto.CategoryDto;
 import org.example.grocery_app.dto.ProductDto;
 import org.example.grocery_app.entities.Category;
 import org.example.grocery_app.entities.Product;
+import org.example.grocery_app.exception.ResourceNotFoundException;
 import org.example.grocery_app.repository.CategoryRepository;
 import org.example.grocery_app.service.CategoryService;
 import org.modelmapper.ModelMapper;
@@ -42,7 +43,8 @@ public class CategoryServiceImplementation implements CategoryService {
     }
 
     @Override
-    public CategoryDto updateCategory(CategoryDto categoryDto) {
+    public CategoryDto updateCategory(Long categoryId,CategoryDto categoryDto) {
+        this.categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("category", "categoryId", categoryId));
         return null;
     }
 

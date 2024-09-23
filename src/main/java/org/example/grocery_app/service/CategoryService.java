@@ -7,7 +7,7 @@ import java.util.List;
 public interface CategoryService {
 
     CategoryDto createCategory(CategoryDto categoryDto);
-    CategoryDto updateCategory(CategoryDto categoryDto);
+    CategoryDto updateCategory(Long categoryId,CategoryDto categoryDto);
     List<CategoryDto> getAllCategories();
     CategoryDto getCategoryById(int id);
     void deleteCategoryById(int id);
