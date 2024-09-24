@@ -31,13 +31,15 @@ public class HelperMethod {
                 .collect(Collectors.toSet());
     }
 
-    public Set<Product>changeProductDtoSetIntoProductEntitySet(Set<ProductDto> productDtoList) {
+    public Set<Product>changeProductDtoSetIntoProductEntitySet(Set<ProductDto> productDtoList, Category category) {
         Set<Product> ProductSet = productDtoList.stream()
                 .map(productDto -> {
                     Product product = modelMapper.map(productDto, Product.class);
                     Inventory inventory = this.modelMapper.map(productDto.getInventoryDto(), Inventory.class);
                     product.setInventory(inventory);
                     inventory.setProduct(product);
+                    product.setCategory(category);
+
                     return product;
                 }).collect(Collectors.toSet());
 

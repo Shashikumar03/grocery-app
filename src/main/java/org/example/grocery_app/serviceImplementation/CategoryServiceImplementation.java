@@ -1,5 +1,6 @@
 package org.example.grocery_app.serviceImplementation;
 
+import org.example.grocery_app.dto.AddProductRequestDto;
 import org.example.grocery_app.dto.CategoryDto;
 import org.example.grocery_app.dto.InventoryDto;
 import org.example.grocery_app.dto.ProductDto;
@@ -34,9 +35,9 @@ public class CategoryServiceImplementation implements CategoryService {
         Set<ProductDto> productsDtoSet = categoryDto.getProductsDto();
         Category category = this.modelMapper.map(categoryDto, Category.class);
 
-        Set<Product> products = helperMethod.changeProductDtoSetIntoProductEntitySet(productsDtoSet);
-        category.setProducts(products);
+        Set<Product> products = helperMethod.changeProductDtoSetIntoProductEntitySet(productsDtoSet, category);
         products.forEach(product ->product.setCategory(category));
+        category.setProducts(products);
         Category saveCategory = this.categoryRepository.save(category);
 
         Set<ProductDto> productDtos = this.helperMethod.changeProductEntitySetIntoProductDtoSet(saveCategory.getProducts());
@@ -85,7 +86,7 @@ public class CategoryServiceImplementation implements CategoryService {
 
             }
             product.setInventory(inventory);
-//            updateProducts.add(product);
+
             System.out.println("shyam"+product);
         return product;
 
@@ -137,5 +138,32 @@ public class CategoryServiceImplementation implements CategoryService {
     @Override
     public void deleteCategoryById(int id) {
 
+    }
+
+    public CategoryDto addProductsToCategory(AddProductRequestDto addProductRequestDto) {
+        // Step 1: Retrieve the category
+        Category category = this.categoryRepository.findById(addProductRequestDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", addProductRequestDto.getCategoryId()));
+
+        // Step 2: Convert incoming ProductDto to Product entities
+        Set<Product> products = this.helperMethod.changeProductDtoSetIntoProductEntitySet(addProductRequestDto.getProductsDto(), category);
+
+        // Step 3: Add the new products to the existing set of products in the category
+        category.getProducts().addAll(products);
+
+        // Step 4: Save the updated category along with the new products
+        Category updatedCategory = this.categoryRepository.save(category);
+        System.out.println(updatedCategory);
+
+//        // Step 5: Convert the updated category back to a CategoryDto
+        CategoryDto updatedCategoryDto = this.modelMapper.map(updatedCategory, CategoryDto.class);
+        Set<Product> products1 = updatedCategory.getProducts();
+        System.out.println(products1);
+        Set<ProductDto> productDtos = this.helperMethod.changeProductEntitySetIntoProductDtoSet(products1);
+        System.out.println(productDtos);
+        updatedCategoryDto.setProductsDto(productDtos);
+//        // Step 6: Return the updated category
+        return updatedCategoryDto;
+//        return null;
     }
 }
