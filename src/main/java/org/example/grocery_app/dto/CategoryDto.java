@@ -22,6 +22,6 @@ public class CategoryDto {
     private String description;
 
 
-    private Set<ProductDto> products;
+    private Set<ProductDto> productsDto;
 
 }
