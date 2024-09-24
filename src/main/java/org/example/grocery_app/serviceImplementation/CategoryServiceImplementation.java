@@ -112,12 +112,26 @@ public class CategoryServiceImplementation implements CategoryService {
 
     @Override
     public List<CategoryDto> getAllCategories() {
-        return List.of();
+
+        List<Category> listOfCategory = this.categoryRepository.findAll();
+        return listOfCategory.stream().map(category -> {
+            CategoryDto categoryDto = this.modelMapper.map(category, CategoryDto.class);
+            Set<ProductDto> productDtos = this.helperMethod.changeProductEntitySetIntoProductDtoSet(category.getProducts());
+            categoryDto.setProductsDto(productDtos);
+            return categoryDto;
+        }).collect(Collectors.toList());
     }
 
     @Override
-    public CategoryDto getCategoryById(int id) {
-        return null;
+    public CategoryDto getCategoryById(Long categoryId) {
+        // step 1 find the category
+        Category category = this.categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("category", "categoryId", categoryId));
+        // step 2 find products and change into product dto
+        Set<Product> products = category.getProducts();
+        Set<ProductDto> productDtos = this.helperMethod.changeProductEntitySetIntoProductDtoSet(products);
+        CategoryDto categoryDto = this.modelMapper.map(category, CategoryDto.class);
+        categoryDto.setProductsDto(productDtos);
+        return categoryDto;
     }
 
     @Override

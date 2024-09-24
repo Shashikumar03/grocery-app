@@ -28,6 +28,16 @@ public class CategoryController {
         CategoryDto responseCategoryDto = this.categoryService.updateCategory(categoryId, categoryDto);
         return new ResponseEntity<>(responseCategoryDto,HttpStatus.OK);
     }
+    @GetMapping("/{categoryId}")
+    public  ResponseEntity<CategoryDto> getCategory(@PathVariable Long categoryId){
+        CategoryDto categoryById = this.categoryService.getCategoryById(categoryId);
+        return new ResponseEntity<>(categoryById,HttpStatus.OK);
+    }
+    @GetMapping("/all")
+    public  ResponseEntity<List<CategoryDto>> getAllCategory(){
+        List<CategoryDto> allCategories = this.categoryService.getAllCategories();
+        return new ResponseEntity<>(allCategories,HttpStatus.OK);
+    }
 
 
 
