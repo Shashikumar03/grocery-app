@@ -13,6 +13,6 @@ public class StringTrimmerDeserializer extends JsonDeserializer<String> {
     public String deserialize(JsonParser jsonParser, DeserializationContext context)
             throws IOException, JsonProcessingException {
         String value = jsonParser.getText();
-        return value != null ? value.trim() : null; // Trim the string if not null
+        return value != null ? value.trim() : null;
     }
 }

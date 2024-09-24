@@ -1,5 +1,6 @@
 package org.example.grocery_app.serviceImplementation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.grocery_app.dto.AddProductRequestDto;
 import org.example.grocery_app.dto.CategoryDto;
 import org.example.grocery_app.dto.InventoryDto;
@@ -18,7 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-
+@Slf4j
 public class CategoryServiceImplementation implements CategoryService {
 
     @Autowired
@@ -64,7 +65,7 @@ public class CategoryServiceImplementation implements CategoryService {
 //        Set<Product> updateProducts = category.getProducts();
         //step 3 verify and update the product and inventory
         Set<Product> updateProducts=category.getProducts().stream().map(product -> {
-            System.out.println("hello");
+//            System.out.println("hello");
             boolean requireUpdate = updateProductsDto.containsKey(product.getId());
             if (requireUpdate) {
                 ProductDto product1 = updateProductsDto.get(product.getId());
@@ -77,17 +78,21 @@ public class CategoryServiceImplementation implements CategoryService {
 
             }
             Inventory inventory = product.getInventory();
-            boolean requireInventryUpdate = updateInventoryDto.containsKey(inventory.getId());
-
-            if (requireInventryUpdate) {
+            boolean requireInventoryUpdate = updateInventoryDto.containsKey(inventory.getId());
+            log.info("checking inventory id exist or not : {}",requireInventoryUpdate);
+            if (requireInventoryUpdate) {
                 InventoryDto inventory1 = updateInventoryDto.get(inventory.getId());
+                inventory.setStockQuantity(inventory1.getStockQuantity());
                 inventory.setReservedStock(inventory1.getReservedStock());
-                inventory.setReservedStock(inventory1.getReservedStock());
+                System.out.println("shashi kumar kushwaha");
+                System.out.println(inventory1);
+                System.out.println(inventory);
 
             }
             product.setInventory(inventory);
+            inventory.setProduct(product);
 
-            System.out.println("shyam"+product);
+//            System.out.println("shyam"+product);
         return product;
 
         }).collect(Collectors.toSet());
@@ -99,7 +104,7 @@ public class CategoryServiceImplementation implements CategoryService {
 
 
         Category saveCategory = this.categoryRepository.save(category);
-        System.out.println(saveCategory);
+//        System.out.println(saveCategory);
 
 //      step 5 changing entity into dto
         Set<Product> saveProducts = saveCategory.getProducts();
