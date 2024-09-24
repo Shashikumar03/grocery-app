@@ -35,14 +35,16 @@ public class CategoryServiceImplementation implements CategoryService {
         Category category = this.modelMapper.map(categoryDto, Category.class);
 
         Set<Product> products = helperMethod.changeProductDtoSetIntoProductEntitySet(productsDtoSet);
-        products.stream().peek(p-> p.setCategory(category));
         category.setProducts(products);
+        products.forEach(product ->product.setCategory(category));
         Category saveCategory = this.categoryRepository.save(category);
 
         Set<ProductDto> productDtos = this.helperMethod.changeProductEntitySetIntoProductDtoSet(saveCategory.getProducts());
         CategoryDto saveCategoryDto = this.modelMapper.map(saveCategory, CategoryDto.class);
         saveCategoryDto.setProductsDto(productDtos);
         return saveCategoryDto;
+//        System.out.println(products);
+//        return  null;
     }
 
     @Override

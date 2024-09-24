@@ -37,6 +37,7 @@ public class HelperMethod {
                     Product product = modelMapper.map(productDto, Product.class);
                     Inventory inventory = this.modelMapper.map(productDto.getInventoryDto(), Inventory.class);
                     product.setInventory(inventory);
+                    inventory.setProduct(product);
                     return product;
                 }).collect(Collectors.toSet());
 
