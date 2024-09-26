@@ -3,9 +3,11 @@ package org.example.grocery_app.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@ToString(exclude = "carts")
 @Getter
 @Setter
 @Entity
@@ -22,4 +24,7 @@ public class User {
     private String role;
     @Column(unique = true)
     private String phoneNumber;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Cart> carts;
 }
