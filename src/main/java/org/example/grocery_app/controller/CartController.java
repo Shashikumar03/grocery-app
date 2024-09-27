@@ -5,6 +5,7 @@ import org.example.grocery_app.dto.CartDto;
 import org.example.grocery_app.dto.CartItemDto;
 import org.example.grocery_app.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,11 +37,11 @@ public class CartController {
 //    }
 //
 //    // View user's cart
-//    @GetMapping("/{userId}")
-//    public ResponseEntity<CartDto> viewCart(@PathVariable Long userId) {
-//        CartDto cartDto = cartService.viewCart(userId);
-//        return ResponseEntity.ok(cartDto);
-//    }
+    @GetMapping("/{userId}")
+    public ResponseEntity<CartDto> viewCart(@PathVariable Long userId) {
+        CartDto cartDto = cartService.viewUserCart(userId);
+        return ResponseEntity.ok(cartDto);
+    }
 //
 //    // Clear cart
 //    @DeleteMapping("/{userId}/clear")
@@ -48,4 +49,10 @@ public class CartController {
 //        cartService.clearCart(userId);
 //        return ResponseEntity.noContent().build();
 //    }
+
+    @PutMapping("/remove/{userId}/{cardItemId}")
+    public ResponseEntity<CartDto> removeProductFromCart(@PathVariable Long userId,@PathVariable Long cardItemId) {
+        CartDto cartDto = this.cartService.removeProductFromCart(userId, cardItemId);
+        return new ResponseEntity<>(cartDto, HttpStatus.OK);
+    }
 }

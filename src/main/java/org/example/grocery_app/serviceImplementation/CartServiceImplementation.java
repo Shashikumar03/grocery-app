@@ -1,13 +1,12 @@
 package org.example.grocery_app.serviceImplementation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.grocery_app.constant.CartStatus;
 import org.example.grocery_app.dto.CartDto;
 import org.example.grocery_app.dto.CartItemDto;
 import org.example.grocery_app.dto.UserDto;
-import org.example.grocery_app.entities.Cart;
-import org.example.grocery_app.entities.CartItem;
-import org.example.grocery_app.entities.Product;
-import org.example.grocery_app.entities.User;
+import org.example.grocery_app.entities.*;
+import org.example.grocery_app.exception.ApiException;
 import org.example.grocery_app.exception.ResourceNotFoundException;
 import org.example.grocery_app.repository.CartItemRepository;
 import org.example.grocery_app.repository.CartRepository;
@@ -23,6 +22,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class CartServiceImplementation implements CartService {
 
@@ -41,65 +41,144 @@ public class CartServiceImplementation implements CartService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private HelperMethod helperMethod;
+
     @Override
     public CartDto addProductToCart(Long userId, CartItemDto cartItemDto) {
-        User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
-        Product product = this.productRepository.findById(cartItemDto.getProductId()).orElseThrow(() -> new ResourceNotFoundException("Product", "productId", cartItemDto.getProductId()));
+        // Fetch the user from the repository
+        User user = this.userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+
+        // Fetch the product from the repository
+        Product product = this.productRepository.findById(cartItemDto.getProductId())
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", cartItemDto.getProductId()));
+
+        Inventory inventory = product.getInventory(); // Assuming Inventory exists for the product
+
         // Check if the user already has a cart
         Optional<Cart> optionalCart = cartRepository.findByUser(user);
         Cart cart;
-        CartItem cartItem1 = this.modelMapper.map(cartItemDto, CartItem.class);
 
         // If the cart doesn't exist, create a new one
         if (optionalCart.isEmpty()) {
-            HashSet<CartItem> setOfCartItems= new HashSet<>();
-            setOfCartItems.add(cartItem1);
+            log.info("No existing cart found for user ID {}. Creating a new cart: {}", userId, cartItemDto);
             cart = new Cart();
             cart.setUser(user);
             cart.setStatus(CartStatus.ACTIVE);
-            cart.setCartItems(setOfCartItems);
-            cartRepository.save(cart);
+            cart.setCartItems(new HashSet<>());
+
+            // Save the cart FIRST to avoid TransientObjectException
+            cart = cartRepository.save(cart);
         } else {
             cart = optionalCart.get();
-            cart.setStatus(CartStatus.ACTIVE);
         }
 
         // Check if the product is already in the cart
         Set<CartItem> items = cart.getCartItems();
-
         Optional<CartItem> optionalCartItem = cartItemRepository.findByCartAndProduct(cart, product);
         CartItem cartItem;
-//
+
         if (optionalCartItem.isPresent()) {
             // If the product already exists in the cart, update the quantity
             cartItem = optionalCartItem.get();
-            cartItem.setQuantity(cartItem.getQuantity() + cartItemDto.getQuantity());
-            items.add(cartItem);
+            int newQuantity = cartItem.getQuantity() + cartItemDto.getQuantity();
+            if (inventory.getStockQuantity() < newQuantity) {
+                log.info("This product is out of stock: {}", product);
+                throw new ApiException("Out of stock");
+            }
+            cartItem.setQuantity(newQuantity);
         } else {
             // Otherwise, create a new cart item
             cartItem = new CartItem();
-            cartItem.setCart(cart);
+            cartItem.setCart(cart);  // Link the cart and cartItem
             cartItem.setProduct(product);
-            cartItem.setQuantity(cartItem.getQuantity()+cartItemDto.getQuantity());
+            cartItem.setQuantity(cartItemDto.getQuantity());
+
+            if (inventory.getStockQuantity() < cartItem.getQuantity()) {
+                log.info("This product is out of stock: {}", product);
+                throw new ApiException("Out of stock");
+            }
+
+            // Add the new cart item to the cart
             items.add(cartItem);
+
+            // Save the cartItem explicitly if it has a separate repository (to avoid TransientObjectException)
+//            cartItemRepository.save(cartItem);
         }
-//
-//        // Save the cart item
+
+        // Save the cart with the updated items (this might cascade save the cart items as well)
         cart.setCartItems(items);
-        Cart saveCart = this.cartRepository.save(cart);
+        Cart savedCart = cartRepository.save(cart);
 
-
-//        converting savecart into cartDto
-        CartDto cartDto = this.modelMapper.map(saveCart, CartDto.class);
-        User user1 = saveCart.getUser();
-
-        Set<CartItem> cartItems = saveCart.getCartItems();
-
-        UserDto userDto = this.modelMapper.map(user1, UserDto.class);
+        // Convert saved cart to CartDto and return
+        CartDto cartDto = this.modelMapper.map(savedCart, CartDto.class);
+        UserDto userDto = this.modelMapper.map(savedCart.getUser(), UserDto.class);
         cartDto.setUserDto(userDto);
-        Set<CartItemDto> setOfcartItemDto = cartItems.stream().map(cartItem11 -> this.modelMapper.map(cartItem11, CartItemDto.class)).collect(Collectors.toSet());
-        cartDto.setCartItemsDto(setOfcartItemDto);
+
+        Set<CartItemDto> cartItemDtos = savedCart.getCartItems().stream()
+                .map(cartItemEntity -> this.modelMapper.map(cartItemEntity, CartItemDto.class))
+                .collect(Collectors.toSet());
+        cartDto.setCartItemsDto(cartItemDtos);
 
         return cartDto;
+    }
+
+
+    @Override
+    public CartDto removeProductFromCart(Long userId, Long productId) {
+        // Fetch the user from the repository
+        User user = this.userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+
+        // Find the active cart for the user
+        Cart cart = this.cartRepository.findByUserAndStatus(user, CartStatus.ACTIVE)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart", "userId", userId));
+
+        // Get the existing cart items
+        Set<CartItem> cartItems = cart.getCartItems();
+
+        // Find the cart item with the matching product ID
+        CartItem itemToRemove = cartItems.stream()
+                .filter(cartItem -> cartItem.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElse(null); // Use null to indicate item was not found
+
+        // If the item exists, remove it
+        if (itemToRemove != null) {
+            cartItems.remove(itemToRemove); // Remove the found item
+        } else {
+            // Handle the case where the product is not found in the cart
+            throw new ResourceNotFoundException("CartItem", "productId", productId);
+        }
+
+        // Save the updated cart to persist changes
+        cart.setCartItems(cartItems);
+        Cart savedCart = this.cartRepository.save(cart);
+
+        // Convert the saved cart to CartDto
+        CartDto cartDto = this.modelMapper.map(savedCart, CartDto.class);
+
+        // Convert User entity to UserDto
+        UserDto userDto = this.modelMapper.map(savedCart.getUser(), UserDto.class);
+        cartDto.setUserDto(userDto);
+
+        // Convert CartItems to CartItemDto and set in CartDto
+        Set<CartItemDto> cartItemDtoSet = savedCart.getCartItems().stream()
+                .map(cartItem -> this.modelMapper.map(cartItem, CartItemDto.class))
+                .collect(Collectors.toSet());
+        cartDto.setCartItemsDto(cartItemDtoSet);
+
+        return cartDto;
+    }
+
+    @Override
+    public CartDto viewUserCart(Long userId) {
+        User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+        Cart cart = this.cartRepository.findByUserAndStatus(user, CartStatus.ACTIVE).orElseThrow(() -> new ApiException("no cart found for this user " + userId));
+//        Optional<Cart> cartByUserAndStatus = this.cartRepository.findByUserAndStatus(user, CartStatus.ACTIVE).orElseThrow(()-> new ApiException("no cart foun"));
+
+        return this.helperMethod.changeCartIntoCartDto(cart);
+
     }
 }

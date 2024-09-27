@@ -1,6 +1,5 @@
 package org.example.grocery_app.entities;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.grocery_app.constant.CartStatus;
@@ -18,17 +17,13 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // One cart can have many CartItems
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<CartItem> CartItems;
 
-
     @Enumerated(EnumType.STRING)
     private CartStatus status;
-
 }

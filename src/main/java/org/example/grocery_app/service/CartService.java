@@ -6,5 +6,8 @@ import org.example.grocery_app.entities.CartItem;
 
 public interface CartService {
 
-    CartDto addProductToCart(Long userId, CartItemDto cartItemDtoxx);
+    CartDto addProductToCart(Long userId, CartItemDto cartItemDto);
+    CartDto removeProductFromCart(Long userId, Long productId);
+
+    CartDto viewUserCart(Long userId);
 }

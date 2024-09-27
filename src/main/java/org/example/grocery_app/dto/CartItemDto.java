@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @ToString
 public class CartItemDto {
-    private Long id;
+    private Long cartItemId;
     private Long productId; // Only the product ID instead of the full Product entity
     private String productName; // You can add other product details if needed
     private int quantity; // Quantity of the product in the cart

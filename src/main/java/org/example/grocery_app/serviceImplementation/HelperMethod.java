@@ -54,6 +54,23 @@ public class HelperMethod {
                 .collect(Collectors.toSet());
     }
 
+    public  CartDto changeCartIntoCartDto(Cart cart) {
+        CartDto cartDto = modelMapper.map(cart, CartDto.class);
+        Set<CartItem> cartItems = cart.getCartItems();
+        Set<CartItemDto> setOfCartItemDto = cartItems.stream().map(item -> {
+            Product product = item.getProduct();
+//            ProductDto productDto = this.modelMapper.map(product, ProductDto.class);
+            CartItemDto cartItemDto = this.modelMapper.map(item, CartItemDto.class);
+            cartItemDto.setProductName(product.getName());
+
+
+            return cartItemDto;
+        }).collect(Collectors.toSet());
+       cartDto.setCartItemsDto(setOfCartItemDto);
+       return cartDto;
+
+    }
+
 
 }
 
