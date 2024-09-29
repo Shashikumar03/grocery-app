@@ -17,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -46,6 +47,7 @@ public class CartServiceImplementation implements CartService {
 
     @Override
     public CartDto addProductToCart(Long userId, CartItemDto cartItemDto) {
+        System.out.println("shashi");
         // Fetch the user from the repository
         User user = this.userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
@@ -54,7 +56,7 @@ public class CartServiceImplementation implements CartService {
         Product product = this.productRepository.findById(cartItemDto.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", cartItemDto.getProductId()));
 
-        Inventory inventory = product.getInventory(); // Assuming Inventory exists for the product
+        Inventory inventory = product.getInventory();
 
         // Check if the user already has a cart
         Optional<Cart> optionalCart = cartRepository.findByUser(user);
@@ -91,7 +93,7 @@ public class CartServiceImplementation implements CartService {
         } else {
             // Otherwise, create a new cart item
             cartItem = new CartItem();
-            cartItem.setCart(cart);  // Link the cart and cartItem
+            cartItem.setCart(cart);
             cartItem.setProduct(product);
             cartItem.setQuantity(cartItemDto.getQuantity());
 
@@ -120,7 +122,6 @@ public class CartServiceImplementation implements CartService {
                 .map(cartItemEntity -> this.modelMapper.map(cartItemEntity, CartItemDto.class))
                 .collect(Collectors.toSet());
         cartDto.setCartItemsDto(cartItemDtos);
-
         return cartDto;
     }
 
@@ -176,9 +177,15 @@ public class CartServiceImplementation implements CartService {
     public CartDto viewUserCart(Long userId) {
         User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
         Cart cart = this.cartRepository.findByUserAndStatus(user, CartStatus.ACTIVE).orElseThrow(() -> new ApiException("no cart found for this user " + userId));
+        System.out.println(cart);
 //        Optional<Cart> cartByUserAndStatus = this.cartRepository.findByUserAndStatus(user, CartStatus.ACTIVE).orElseThrow(()-> new ApiException("no cart foun"));
 
-        return this.helperMethod.changeCartIntoCartDto(cart);
+        CartDto cartDto = this.helperMethod.changeCartIntoCartDto(cart);
+        cartDto.setCartTotalPrice(BigDecimal.valueOf(cart.getTotalPricesOfAllProduct()));
+
+        System.out.println(cartDto);
+        return cartDto;
+
 
     }
 }

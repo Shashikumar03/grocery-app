@@ -1,6 +1,7 @@
 package org.example.grocery_app.exception;
 
 
+import jakarta.validation.ConstraintViolationException;
 import org.example.grocery_app.apiPayload.ApiResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -48,7 +49,23 @@ public class GlobalExceptionHandler {
         // You can customize the message based on the root cause
         String message = "Database error: " + ex.getMostSpecificCause().getMessage();
         ApiResponse apiResponse = new ApiResponse(message, false);
-        return new ResponseEntity<>(apiResponse, HttpStatus.CONFLICT); // 409 Conflict for data violations
+        return new ResponseEntity<>(apiResponse, HttpStatus.CONFLICT);
     }
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, String>> handleConstraintViolation(ConstraintViolationException ex) {
+        ex.getMessage();
+        Map<String, String> errors = new HashMap<>();
 
+        // Iterate through each violation
+        ex.getConstraintViolations().forEach(violation -> {
+            // Get the property path (e.g., "stockQuantity")
+            String propertyPath = violation.getPropertyPath().toString();
+            // Get the message (e.g., "Stock quantity cannot be negative")
+            String message = violation.getMessage();
+            // Store in the errors map
+            errors.put(propertyPath, message);
+        });
+        System.out.println(errors);
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
 }

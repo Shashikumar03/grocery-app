@@ -56,14 +56,13 @@ public class HelperMethod {
 
     public  CartDto changeCartIntoCartDto(Cart cart) {
         CartDto cartDto = modelMapper.map(cart, CartDto.class);
+        cartDto.setCartId(cart.getId());
         Set<CartItem> cartItems = cart.getCartItems();
         Set<CartItemDto> setOfCartItemDto = cartItems.stream().map(item -> {
             Product product = item.getProduct();
 //            ProductDto productDto = this.modelMapper.map(product, ProductDto.class);
             CartItemDto cartItemDto = this.modelMapper.map(item, CartItemDto.class);
             cartItemDto.setProductName(product.getName());
-
-
             return cartItemDto;
         }).collect(Collectors.toSet());
        cartDto.setCartItemsDto(setOfCartItemDto);
@@ -71,6 +70,32 @@ public class HelperMethod {
 
     }
 
+    public CartItemDto changeCartItemIntoCartItemDto(CartItem cartItem) {
+        CartItemDto cartItemDto = modelMapper.map(cartItem, CartItemDto.class);
+        cartItemDto.setCartItemId(cartItem.getId());
+        return cartItemDto;
+    }
+
+    public OrderDto changeOrderIntoOrderDto(Order order) {
+        OrderDto orderDto = modelMapper.map(order, OrderDto.class);
+
+        Payment payment = order.getPayment();
+        PaymentDto paymentDto = this.modelMapper.map(payment, PaymentDto.class);
+//        paymentDto.setOrderDto(orderDto);
+        orderDto.setPaymentDto(paymentDto);
+
+        Delivery delivery = order.getDelivery();
+        DeliveryDto deliveryDto = this.modelMapper.map(delivery, DeliveryDto.class);
+//        deliveryDto.setOrderDto(orderDto);
+        orderDto.setDeliveryDto(deliveryDto);
+
+        Cart cart = order.getCart();
+
+        CartDto cartDto = changeCartIntoCartDto(cart);
+        orderDto.setCartDto(cartDto);
+
+        return orderDto;
+    }
 
 }
 

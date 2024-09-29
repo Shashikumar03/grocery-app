@@ -1,5 +1,6 @@
 package org.example.grocery_app.controller;
 
+import jakarta.validation.Valid;
 import org.example.grocery_app.dto.CartDto;
 //import org.example.grocery_app.payload.CartItemRequest;
 import org.example.grocery_app.dto.CartItemDto;
@@ -18,9 +19,7 @@ public class CartController {
 
     // Add product to cart
     @PostMapping("/{userId}/add")
-    public ResponseEntity<CartDto> addProductToCart(
-            @PathVariable Long userId,
-            @RequestBody CartItemDto cartItem) {
+    public ResponseEntity<CartDto> addProductToCart(@PathVariable Long userId, @Valid @RequestBody CartItemDto cartItem) {
 
         CartDto updatedCart = cartService.addProductToCart(userId, cartItem);
         return ResponseEntity.ok(updatedCart);

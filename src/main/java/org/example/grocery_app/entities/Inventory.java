@@ -1,6 +1,7 @@
 package org.example.grocery_app.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 
 @ToString(exclude = "product")
@@ -19,8 +20,10 @@ public class Inventory {
     private Product product;
 //    private Products
 
-
+    @Min(value = 0, message = "Stock quantity cannot be negative")
     private int stockQuantity;
+
+    @Min(value = 0, message = "Stock reservedStock cannot be negative")
     private int reservedStock;
 
 }

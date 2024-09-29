@@ -4,6 +4,7 @@ import lombok.*;
 import org.example.grocery_app.constant.CartStatus;
 import org.example.grocery_app.entities.User;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Getter
@@ -12,8 +13,9 @@ import java.util.Set;
 @AllArgsConstructor
 @ToString
 public class CartDto {
-    private Long id;
+    private Long cartId;
     private UserDto userDto;
     private Set<CartItemDto> cartItemsDto;
     private CartStatus status;
+    private BigDecimal cartTotalPrice;
 }

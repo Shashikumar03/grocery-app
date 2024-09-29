@@ -26,4 +26,13 @@ public class Cart {
 
     @Enumerated(EnumType.STRING)
     private CartStatus status;
+
+    public double getTotalPricesOfAllProduct() {
+        // Summing the total price of all cart items
+        return CartItems.stream()
+                .mapToDouble(CartItem::getTotalPrice)
+                .sum();
+    }
+
+
 }

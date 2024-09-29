@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "order")
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +22,6 @@ public class Payment {
     private Order order;
 
     private String paymentMode; // PAYTM, UPI, CARD
-    private String status; // PENDING, COMPLETED, FAILED
+    private String paymentStatus; // PENDING, COMPLETED, FAILED
     private LocalDateTime paymentTime;
 }
