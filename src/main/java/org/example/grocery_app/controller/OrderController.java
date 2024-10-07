@@ -3,6 +3,7 @@ package org.example.grocery_app.controller;
 import org.example.grocery_app.dto.OrderDto;
 import org.example.grocery_app.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +19,8 @@ public class OrderController {
 
     @PostMapping("/{userId}")
     public ResponseEntity<OrderDto> getPlaceOrder(@PathVariable Long userId) {
-        OrderDto order = this.orderService.createOrder(userId);
-        return ResponseEntity.ok(order);
+        OrderDto orderDto = this.orderService.createOrder(userId);
+        return new ResponseEntity<>(orderDto, HttpStatus.CREATED);
     }
 
 }

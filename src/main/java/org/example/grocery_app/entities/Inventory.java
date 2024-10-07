@@ -1,5 +1,6 @@
 package org.example.grocery_app.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
@@ -17,6 +18,7 @@ public class Inventory {
 
     @OneToOne
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     private Product product;
 //    private Products
 

@@ -76,26 +76,26 @@ public class HelperMethod {
         return cartItemDto;
     }
 
-    public OrderDto changeOrderIntoOrderDto(Order order) {
-        OrderDto orderDto = modelMapper.map(order, OrderDto.class);
-
-        Payment payment = order.getPayment();
-        PaymentDto paymentDto = this.modelMapper.map(payment, PaymentDto.class);
-//        paymentDto.setOrderDto(orderDto);
-        orderDto.setPaymentDto(paymentDto);
-
-        Delivery delivery = order.getDelivery();
-        DeliveryDto deliveryDto = this.modelMapper.map(delivery, DeliveryDto.class);
-//        deliveryDto.setOrderDto(orderDto);
-        orderDto.setDeliveryDto(deliveryDto);
-
-        Cart cart = order.getCart();
-
-        CartDto cartDto = changeCartIntoCartDto(cart);
-        orderDto.setCartDto(cartDto);
-
-        return orderDto;
-    }
+//    public OrderDto changeOrderIntoOrderDto(Order order) {
+//        OrderDto orderDto = modelMapper.map(order, OrderDto.class);
+//
+////        Payment payment = order.getPayment();
+//        PaymentDto paymentDto = this.modelMapper.map(payment, PaymentDto.class);
+////        paymentDto.setOrderDto(orderDto);
+//        orderDto.setPaymentDto(paymentDto);
+//
+//        Delivery delivery = order.getDelivery();
+//        DeliveryDto deliveryDto = this.modelMapper.map(delivery, DeliveryDto.class);
+////        deliveryDto.setOrderDto(orderDto);
+//        orderDto.setDeliveryDto(deliveryDto);
+//
+//        Cart cart = order.getCart();
+//
+//        CartDto cartDto = changeCartIntoCartDto(cart);
+//        orderDto.setCartDto(cartDto);
+//
+//        return orderDto;
+//    }
 
 }
 

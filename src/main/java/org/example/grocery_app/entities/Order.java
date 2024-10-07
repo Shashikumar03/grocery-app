@@ -1,5 +1,6 @@
 package org.example.grocery_app.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,9 +18,10 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    @JsonIgnore
+//    private User user;
 
 //    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 //    private List<OrderItem> items;

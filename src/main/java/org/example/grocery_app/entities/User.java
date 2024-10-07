@@ -3,11 +3,12 @@ package org.example.grocery_app.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = "carts")
+@ToString(exclude = {"carts", "order"})
 @Getter
 @Setter
 @Entity
@@ -27,4 +28,7 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Cart> carts;
+
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    List<Order> order;
 }

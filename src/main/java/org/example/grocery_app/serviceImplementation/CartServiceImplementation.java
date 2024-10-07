@@ -59,7 +59,7 @@ public class CartServiceImplementation implements CartService {
         Inventory inventory = product.getInventory();
 
         // Check if the user already has a cart
-        Optional<Cart> optionalCart = cartRepository.findByUser(user);
+        Optional<Cart> optionalCart = cartRepository.findByUserAndStatus(user,CartStatus.ACTIVE);
         Cart cart;
 
         // If the cart doesn't exist, create a new one
@@ -74,6 +74,7 @@ public class CartServiceImplementation implements CartService {
             cart = cartRepository.save(cart);
         } else {
             cart = optionalCart.get();
+            cart.setStatus(CartStatus.ACTIVE);
         }
 
         // Check if the product is already in the cart
@@ -181,7 +182,7 @@ public class CartServiceImplementation implements CartService {
 //        Optional<Cart> cartByUserAndStatus = this.cartRepository.findByUserAndStatus(user, CartStatus.ACTIVE).orElseThrow(()-> new ApiException("no cart foun"));
 
         CartDto cartDto = this.helperMethod.changeCartIntoCartDto(cart);
-        cartDto.setCartTotalPrice(BigDecimal.valueOf(cart.getTotalPricesOfAllProduct()));
+        cartDto.setCartTotalPrice((cart.getTotalPricesOfAllProduct()));
 
         System.out.println(cartDto);
         return cartDto;

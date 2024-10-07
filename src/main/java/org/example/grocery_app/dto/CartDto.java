@@ -17,5 +17,6 @@ public class CartDto {
     private UserDto userDto;
     private Set<CartItemDto> cartItemsDto;
     private CartStatus status;
-    private BigDecimal cartTotalPrice;
+
+    private double cartTotalPrice;
 }

@@ -1,6 +1,7 @@
 package org.example.grocery_app.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class Payment {
 
     @OneToOne
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private Order order;
 
     private String paymentMode; // PAYTM, UPI, CARD
