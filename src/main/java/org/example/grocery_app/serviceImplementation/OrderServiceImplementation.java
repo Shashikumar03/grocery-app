@@ -17,10 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,16 +83,31 @@ public class OrderServiceImplementation implements OrderService {
         Set<Long>inventoryIds = new HashSet<>();
         cart.getCartItems().forEach(cartItem -> {
             Inventory inventory = cartItem.getProduct().getInventory();
-            inventoryQuntity.put(inventory, inventory.getStockQuantity());
+            inventoryQuntity.put(inventory, cartItem.getQuantity());
             inventoryIds.add(inventory.getId());
         });
+        List<Inventory> allInventoryByIds = this.inventoryRepository.findAllById(inventoryIds);
+        System.out.println("hello dhokhebaaz shikha");
+        System.out.println(allInventoryByIds);
+        allInventoryByIds.forEach(inventory -> {
+            int stockQuantity = inventory.getStockQuantity();
+            int quantitySold = inventoryQuntity.get(inventory);
+            int stockQuantity1= stockQuantity - quantitySold;
+            System.out.println(stockQuantity);
+            System.out.println(quantitySold);
+            System.out.println(stockQuantity1+" 0000"+"shashi kumar kushwaha");
+            inventory.setStockQuantity(stockQuantity1);
+            this.inventoryRepository.save(inventory);
 
+        });
         // Save the order
         Order savedOrder = orderRepository.save(order);
 
         // Mark the cart as completed
         cart.setStatus(CartStatus.COMPLETED);
         cartRepository.save(cart);
+
+
 
         // Create a new active cart for the user
         Cart newCart = new Cart();

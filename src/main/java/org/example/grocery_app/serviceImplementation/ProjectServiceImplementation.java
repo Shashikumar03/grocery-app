@@ -51,7 +51,7 @@ public class ProjectServiceImplementation implements ProductService {
 
 //        update inventory 
         inventory.setReservedStock(updateInventoryDto.getReservedStock());
-        inventory.setReservedStock(updateInventoryDto.getReservedStock());
+        inventory.setStockQuantity(updateInventoryDto.getStockQuantity());
         inventory.setProduct(product);
         // update the product also
         product.setName(productDto.getName());
@@ -65,7 +65,10 @@ public class ProjectServiceImplementation implements ProductService {
         InventoryDto inventoryDto  = this.modalMapper.map(productSaved.getInventory(), InventoryDto.class);
 
         ProductDto productDto1 = this.modalMapper.map(productSaved, ProductDto.class);
+        productDto1.setId(product.getId());
+        inventoryDto.setId(inventory.getId());
         productDto1.setInventoryDto(inventoryDto);
-        return productDto;
+        System.out.println(productDto1);
+        return productDto1;
     }
 }
