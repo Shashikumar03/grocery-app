@@ -164,6 +164,7 @@ public class CartServiceImplementation implements CartService {
 
         // Convert the saved cart to CartDto
         CartDto cartDto = this.modelMapper.map(savedCart, CartDto.class);
+        cartDto.setCartTotalPrice(savedCart.getTotalPricesOfAllProduct());
 
         // Convert User entity to UserDto
         UserDto userDto = this.modelMapper.map(savedCart.getUser(), UserDto.class);
@@ -171,7 +172,11 @@ public class CartServiceImplementation implements CartService {
 
         // Convert CartItems to CartItemDto and set in CartDto
         Set<CartItemDto> cartItemDtoSet = savedCart.getCartItems().stream()
-                .map(cartItem -> this.modelMapper.map(cartItem, CartItemDto.class))
+                .map(cartItem -> {
+                    CartItemDto map = this.modelMapper.map(cartItem, CartItemDto.class);
+                    map.setCartItemId(cartItem.getId());
+                    return map;
+                })
                 .collect(Collectors.toSet());
         cartDto.setCartItemsDto(cartItemDtoSet);
 
