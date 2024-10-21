@@ -15,5 +15,6 @@ public class CartItemDto {
     private Long productId; // Only the product ID instead of the full Product entity
     private String productName; // You can add other product details if needed
     private int quantity; // Quantity of the product in the cart
+    private String imageUrl;
     private BigDecimal price; // Product price, can also be stored in CartItemDto for convenience
 }

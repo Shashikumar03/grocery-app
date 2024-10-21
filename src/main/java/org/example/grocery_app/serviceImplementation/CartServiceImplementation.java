@@ -120,7 +120,11 @@ public class CartServiceImplementation implements CartService {
         cartDto.setUserDto(userDto);
 
         Set<CartItemDto> cartItemDtos = savedCart.getCartItems().stream()
-                .map(cartItemEntity -> this.modelMapper.map(cartItemEntity, CartItemDto.class))
+                .map(cartItemEntity -> {
+                    CartItemDto map = this.modelMapper.map(cartItemEntity, CartItemDto.class);
+                    map.setCartItemId(cartItemEntity.getId());
+                    return  map;
+                })
                 .collect(Collectors.toSet());
         cartDto.setCartItemsDto(cartItemDtos);
         return cartDto;

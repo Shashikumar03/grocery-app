@@ -62,7 +62,10 @@ public class HelperMethod {
             Product product = item.getProduct();
 //            ProductDto productDto = this.modelMapper.map(product, ProductDto.class);
             CartItemDto cartItemDto = this.modelMapper.map(item, CartItemDto.class);
+            cartItemDto.setCartItemId(item.getId());
             cartItemDto.setProductName(product.getName());
+            cartItemDto.setImageUrl(product.getImageUrl());
+
             return cartItemDto;
         }).collect(Collectors.toSet());
        cartDto.setCartItemsDto(setOfCartItemDto);
