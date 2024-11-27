@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class PaymentDto {
 
     private Long paymentId;
+    private String rozerpayId;
 
 
     private OrderDto orderDto;
@@ -22,4 +23,7 @@ public class PaymentDto {
     private String paymentMode;
     private String paymentStatus;
     private LocalDateTime paymentTime;
+
+    private double paymentAmount;
+
 }

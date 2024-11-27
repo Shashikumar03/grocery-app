@@ -7,6 +7,7 @@ import org.example.grocery_app.entities.Payment;
 import org.example.grocery_app.entities.User;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -16,10 +17,11 @@ import java.time.LocalDateTime;
 public class OrderDto {
 
     Long orderId;
-    User user;
+//    User user;
     String OrderStatus;
     PaymentDto paymentDto;
     DeliveryDto deliveryDto;
     LocalDateTime orderTime;
     CartDto cartDto;
+    Set<CartItemDto> cartItemDto;
 }
