@@ -70,12 +70,12 @@ public class UserController {
 
         Long userId = this.jwtHelper.getIdFromToken(token);
         String role = jwtHelper.getRoleFromToken(token);
-        User userFromToken = this.jwtHelper.getUserFromToken(token);
+//        User userFromToken = this.jwtHelper.getUserFromToken(token);
 
         Map<String, Object> userInfo = new HashMap<>();
         userInfo.put("userId", userId);
         userInfo.put("role", role);
-        userInfo.put("user",userFromToken);
+//        userInfo.put("user",userFromToken);
 
         return ResponseEntity.ok(userInfo);
     }
