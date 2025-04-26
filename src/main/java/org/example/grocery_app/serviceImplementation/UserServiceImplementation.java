@@ -7,6 +7,7 @@ import org.example.grocery_app.repository.UserRepository;
 import org.example.grocery_app.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,10 +23,15 @@ public class UserServiceImplementation implements UserService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public UserDto createUser(UserDto userDto) {
-        User User = this.modelMapper.map(userDto, User.class);
-        User save = this.userRepository.save(User);
+
+        User user = this.modelMapper.map(userDto, User.class);
+        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+        User save = this.userRepository.save(user);
         return this.modelMapper.map(save, UserDto.class);
 
     }
