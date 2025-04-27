@@ -4,6 +4,7 @@ package org.example.grocery_app.serviceImplementation;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import jakarta.annotation.PostConstruct;
+import kotlin.io.CloseableKt;
 import lombok.extern.slf4j.Slf4j;
 import org.example.grocery_app.constant.CartStatus;
 import org.example.grocery_app.dto.*;
@@ -17,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -60,24 +62,32 @@ public class OrderServiceImplementation implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderDto createOrder(Long userId) {
         User user = getUserById(userId);
+        log.info("User found successfully :{}",user);
         Cart cart = getActiveCartForUser(user);
 
         validateCartItems(cart);
+        log.info("Card validate successfully}");
 
         Order order = initializeOrder(user, cart);
+        log.info("Order Created Successfully :{}",order);
         Payment payment = createRazorpayOrder(cart);
+        log.info("payment created Successfully {}",payment);
+
 
         order.setPayment(payment);
         payment.setOrder(order);
 
-        Delivery delivery = createDelivery(order);
-        order.setDelivery(delivery);
+        Delivery deliveryAgent = createDelivery(order);
+        order.setDelivery(deliveryAgent);
 
         updateInventoryStock(cart);
+        log.info("Inventory update successfully");
 
         Order savedOrder = orderRepository.save(order);
+        log.info("order created successfully :{}",savedOrder);
 
         completeUserCart(cart);
         createNewActiveCart(user);
@@ -129,11 +139,11 @@ public class OrderServiceImplementation implements OrderService {
             com.razorpay.Order razorpayOrder = razorpayClient.orders.create(orderRequest);
             payment.setRozerpayId(razorpayOrder.get("id"));
             payment.setPaymentStatus(razorpayOrder.get("status"));
-            System.out.println("rozorpay  order details");
-            System.out.println(razorpayOrder);
+            log.info("razorpay  order details");
+            log.info("razorpay order :{}",razorpayOrder);
 
         } catch (RazorpayException e) {
-            log.error("Razorpay order creation failed", e);
+            log.error("Razorpay order creation failed: ", e);
             throw new ApiException("Payment order creation failed. Please try again later.");
         }
 
@@ -159,11 +169,13 @@ public class OrderServiceImplementation implements OrderService {
         });
 
         List<Inventory> inventories = inventoryRepository.findAllById(inventoryIds);
+        log.info("all inventries that has to be update :{}",inventories);
 
         inventories.forEach(inventory -> {
             int updatedQuantity = inventory.getStockQuantity() - inventoryQuantityMap.get(inventory);
             inventory.setStockQuantity(updatedQuantity);
-            inventoryRepository.save(inventory);
+            Inventory save = inventoryRepository.save(inventory);
+            log.info("Inventory after updating  the items :{}",save);
         });
     }
 
@@ -218,9 +230,10 @@ public class OrderServiceImplementation implements OrderService {
 
     @Override
     public List<OrderDto> getOrderByUser(Long userId) {
+
         User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
         List<Order> orderOfUser = this.orderRepository.findByUser(user);
-        System.out.println(orderOfUser);
+        log.info("Order of the user : {}", orderOfUser);
        return  orderOfUser.stream().map((order)->{
            OrderDto orderDto = this.modelMapper.map(order, OrderDto.class);
            Payment payment = order.getPayment();
@@ -232,6 +245,8 @@ public class OrderServiceImplementation implements OrderService {
            if (delivery != null) {
                DeliveryDto deliveryDto = this.modelMapper.map(delivery, DeliveryDto.class);
                orderDto.setDeliveryDto(deliveryDto);
+           }else {
+               throw  new ApiException("Delivery address cannot be null");
            }
 
            Cart cart = order.getCart();

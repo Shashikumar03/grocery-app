@@ -23,7 +23,7 @@ public class Delivery {
     @ManyToOne
     @JoinColumn(name = "delivery_agent_id")
     private User deliveryAgent;
-
+    
     private String deliveryStatus; // ASSIGNED, OUT_FOR_DELIVERY, DELIVERED
     private LocalDateTime deliveryTime;
 }
