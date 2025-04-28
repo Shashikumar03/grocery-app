@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/delivery-address")
 
@@ -22,5 +24,10 @@ public class DeliveryAddressController {
     public ResponseEntity<DeliveryAddressDto> createNewDeliveryAddress(@PathVariable Long userId, @Validated @RequestBody DeliveryAddressDto deliveryAddressDto){
         DeliveryAddressDto newDeliveryAddress = this.deliveryAddressService.createNewDeliveryAddress(userId, deliveryAddressDto);
         return  new ResponseEntity<>(newDeliveryAddress, HttpStatus.CREATED);
+    }
+    @GetMapping("getAll/{userId}")
+    public  ResponseEntity<List<DeliveryAddressDto>> getAllDeliveryAddress(@PathVariable Long userId){
+        List<DeliveryAddressDto> userAllDeliveryAddresses = this.deliveryAddressService.getUserAllDeliveryAddresses(userId);
+        return  new ResponseEntity<>(userAllDeliveryAddresses, HttpStatus.OK);
     }
 }

@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class DeliveryAddressDto {
 
-    private Long DeliveryAddressId;
+    private Long deliveryAddressId;
 
     @NotBlank(message = "Address cannot be blank")
     @Size(min = 5, max = 255, message = "Address must be between 5 and 255 characters")

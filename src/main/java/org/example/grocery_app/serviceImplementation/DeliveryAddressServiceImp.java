@@ -1,6 +1,7 @@
 package org.example.grocery_app.serviceImplementation;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.example.grocery_app.dto.AddProductRequestDto;
 import org.example.grocery_app.dto.DeliveryAddressDto;
 import org.example.grocery_app.dto.UserDto;
 import org.example.grocery_app.entities.DeliveryAddress;
@@ -54,6 +55,12 @@ public class DeliveryAddressServiceImp implements DeliveryAddressService {
 
     @Override
     public List<DeliveryAddressDto> getUserAllDeliveryAddresses(Long userId) {
-        return List.of();
+        this.securityUtils.validateUserAccess(userId, request);
+        List<DeliveryAddress> listOfUserAddress = this.deliveryAddressRepository.findByUserId(userId);
+        List<DeliveryAddressDto> list = listOfUserAddress.stream()
+                .map(address -> this.modelMapper.map(address, DeliveryAddressDto.class))
+                .toList();
+
+        return list;
     }
 }
