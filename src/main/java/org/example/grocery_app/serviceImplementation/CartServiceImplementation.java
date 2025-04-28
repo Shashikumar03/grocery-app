@@ -1,5 +1,6 @@
 package org.example.grocery_app.serviceImplementation;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.example.grocery_app.constant.CartStatus;
 import org.example.grocery_app.dto.CartDto;
@@ -12,13 +13,18 @@ import org.example.grocery_app.repository.CartItemRepository;
 import org.example.grocery_app.repository.CartRepository;
 import org.example.grocery_app.repository.ProductRepository;
 import org.example.grocery_app.repository.UserRepository;
+import org.example.grocery_app.security.JwtHelper;
+import org.example.grocery_app.security.SecurityUtils;
 import org.example.grocery_app.service.CartService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,12 +51,28 @@ public class CartServiceImplementation implements CartService {
     @Autowired
     private HelperMethod helperMethod;
 
+    @Autowired
+    private JwtHelper jwtHelper;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private SecurityUtils securityUtils;
+
+
+
+
     @Override
     public CartDto addProductToCart(Long userId, CartItemDto cartItemDto) {
         System.out.println("shashi");
+
+        this.securityUtils.validateUserAccess(userId, this.request);
         // Fetch the user from the repository
         User user = this.userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+
+
 
         // Fetch the product from the repository
         Product product = this.productRepository.findById(cartItemDto.getProductId())
@@ -133,6 +155,9 @@ public class CartServiceImplementation implements CartService {
 
     @Override
     public CartDto removeProductFromCart(Long userId, Long productId) {
+
+        this.securityUtils.validateUserAccess(userId,request);
+
         // Fetch the user from the repository
         User user = this.userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
@@ -185,6 +210,7 @@ public class CartServiceImplementation implements CartService {
 
     @Override
     public CartDto viewUserCart(Long userId) {
+        this.securityUtils.validateUserAccess(userId,request);
         User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
         Cart cart = this.cartRepository.findByUserAndStatus(user, CartStatus.ACTIVE).orElseThrow(() -> new ApiException("no cart found for this user " + userId));
         System.out.println(cart);

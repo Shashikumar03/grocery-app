@@ -4,6 +4,7 @@ package org.example.grocery_app.serviceImplementation;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import kotlin.io.CloseableKt;
 import lombok.extern.slf4j.Slf4j;
 import org.example.grocery_app.constant.CartStatus;
@@ -12,6 +13,7 @@ import org.example.grocery_app.entities.*;
 import org.example.grocery_app.exception.ApiException;
 import org.example.grocery_app.exception.ResourceNotFoundException;
 import org.example.grocery_app.repository.*;
+import org.example.grocery_app.security.SecurityUtils;
 import org.example.grocery_app.service.OrderService;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
@@ -54,6 +56,12 @@ public class OrderServiceImplementation implements OrderService {
     @Autowired
     private DeliveryAddressRepository deliveryAddressRepository;
 
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private SecurityUtils securityUtils;
+
     @PostConstruct
     public void initRazorpayClient() {
         try {
@@ -67,6 +75,8 @@ public class OrderServiceImplementation implements OrderService {
     @Override
     @Transactional
     public OrderDto createOrder(Long userId, Long deliveryAddressId) {
+
+        this.securityUtils.validateUserAccess(userId, request);
 
         User user = getUserById(userId);
         log.info("User found successfully :{}",user);

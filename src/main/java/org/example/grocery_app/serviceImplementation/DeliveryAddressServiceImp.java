@@ -1,5 +1,6 @@
 package org.example.grocery_app.serviceImplementation;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.grocery_app.dto.DeliveryAddressDto;
 import org.example.grocery_app.dto.UserDto;
 import org.example.grocery_app.entities.DeliveryAddress;
@@ -7,6 +8,7 @@ import org.example.grocery_app.entities.User;
 import org.example.grocery_app.exception.ResourceNotFoundException;
 import org.example.grocery_app.repository.DeliveryAddressRepository;
 import org.example.grocery_app.repository.UserRepository;
+import org.example.grocery_app.security.SecurityUtils;
 import org.example.grocery_app.service.DeliveryAddressService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +25,18 @@ public class DeliveryAddressServiceImp implements DeliveryAddressService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private SecurityUtils securityUtils;
+
     @Override
     public DeliveryAddressDto createNewDeliveryAddress(Long userId, DeliveryAddressDto deliveryAddressDto) {
+
+        this.securityUtils.validateUserAccess(userId, request);
+
         User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user", "userId" ,userId));
 
         DeliveryAddress deliveryAddress = this.modelMapper.map(deliveryAddressDto, DeliveryAddress.class);
