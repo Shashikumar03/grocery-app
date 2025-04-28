@@ -18,9 +18,9 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<OrderDto> getPlaceOrder(@PathVariable Long userId) {
-        OrderDto orderDto = this.orderService.createOrder(userId);
+    @PostMapping("/{userId}/{delivery-addressId}")
+    public ResponseEntity<OrderDto> getPlaceOrder(@PathVariable Long userId, @PathVariable("delivery-addressId") Long deliveryAddressId ) {
+        OrderDto orderDto = this.orderService.createOrder(userId, deliveryAddressId);
         return new ResponseEntity<>(orderDto, HttpStatus.CREATED);
     }
 

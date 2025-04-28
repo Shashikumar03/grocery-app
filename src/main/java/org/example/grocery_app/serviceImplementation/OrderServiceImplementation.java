@@ -51,6 +51,9 @@ public class OrderServiceImplementation implements OrderService {
 
     private RazorpayClient razorpayClient;
 
+    @Autowired
+    private DeliveryAddressRepository deliveryAddressRepository;
+
     @PostConstruct
     public void initRazorpayClient() {
         try {
@@ -63,15 +66,28 @@ public class OrderServiceImplementation implements OrderService {
 
     @Override
     @Transactional
-    public OrderDto createOrder(Long userId) {
+    public OrderDto createOrder(Long userId, Long deliveryAddressId) {
+
         User user = getUserById(userId);
         log.info("User found successfully :{}",user);
         Cart cart = getActiveCartForUser(user);
+        DeliveryAddress deliveryAddress = this.deliveryAddressRepository.findByDeliveryAddressId(deliveryAddressId).orElseThrow(() -> new ResourceNotFoundException("Address", "Delivery Address Id", deliveryAddressId));
+
 
         validateCartItems(cart);
         log.info("Card validate successfully}");
 
         Order order = initializeOrder(user, cart);
+
+//        Setting address of in the order
+        order.setAddress(deliveryAddress.getAddress());
+        order.setLandmark(deliveryAddress.getLandmark());
+        order.setMobile(deliveryAddress.getMobile());
+        order.setCity(deliveryAddress.getCity());
+        order.setPin(deliveryAddress.getPin());
+        order.setState(deliveryAddress.getState());
+
+
         log.info("Order Created Successfully :{}",order);
         Payment payment = createRazorpayOrder(cart);
         log.info("payment created Successfully {}",payment);
@@ -89,7 +105,7 @@ public class OrderServiceImplementation implements OrderService {
         Order savedOrder = orderRepository.save(order);
         log.info("order created successfully :{}",savedOrder);
 
-        completeUserCart(cart);
+        completeUserCart(cart); //clearUserCart
         createNewActiveCart(user);
 
         return convertToOrderDto(savedOrder);

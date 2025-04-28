@@ -40,4 +40,11 @@ public class Order {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "card_id")
     private  Cart cart;
+
+    private String address;
+    private String landmark;
+    private String mobile;
+    private String city;
+    private String pin;
+    private String state;
 }

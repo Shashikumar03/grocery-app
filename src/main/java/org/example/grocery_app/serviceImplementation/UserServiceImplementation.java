@@ -1,5 +1,6 @@
 package org.example.grocery_app.serviceImplementation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.grocery_app.dto.UserDto;
 import org.example.grocery_app.entities.User;
 import org.example.grocery_app.exception.ResourceNotFoundException;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserServiceImplementation implements UserService {
 
@@ -28,10 +30,13 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-
+        log.info("UserDto : {}",userDto.toString());
         User user = this.modelMapper.map(userDto, User.class);
+        user.setUsername(userDto.getUsername());
+        log.info("UserDto Mapped to user{}",user);
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         User save = this.userRepository.save(user);
+        log.info("new created user :{}",save);
         return this.modelMapper.map(save, UserDto.class);
 
     }

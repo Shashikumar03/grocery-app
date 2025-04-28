@@ -36,6 +36,6 @@ public class DeliveryAddressDto {
     @Pattern(regexp = "^\\d{6}$", message = "Pin code must be exactly 6 digits")
     private String pin;
 
-    @NotNull(message = "User ID is required")
+//    @NotNull(message = "User ID is required")
     private Long userId; // ✅ new field
 }
