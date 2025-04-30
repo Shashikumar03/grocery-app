@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,7 @@ public class UserServiceImplementation implements UserService {
     public UserDto createUser(UserDto userDto) {
         log.info("UserDto : {}",userDto.toString());
         User user = this.modelMapper.map(userDto, User.class);
-        user.setUsername(userDto.getUsername());
+        user.setName(userDto.getName());
         log.info("UserDto Mapped to user{}",user);
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         User save = this.userRepository.save(user);
@@ -46,8 +47,8 @@ public class UserServiceImplementation implements UserService {
         User user = this.userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        user.setUsername(userDto.getUsername());
-        user.setPassword(userDto.getPassword());
+        user.setName(userDto.getName());
+        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         user.setEmail(userDto.getEmail());
         user.setAddress(userDto.getAddress());
         user.setRole(userDto.getRole());
@@ -80,5 +81,12 @@ public class UserServiceImplementation implements UserService {
     @Override
     public UserDto getUserByEmail(String email) {
         return null;
+    }
+
+    @Override
+    public List<UserDto> getUserByRole(String role) {
+        List<User> users = this.userRepository.findByRole(role).orElseThrow(() -> new ResourceNotFoundException("", "", 0));
+
+        return users.stream().map((user -> this.modelMapper.map(user, UserDto.class))).toList();
     }
 }

@@ -79,5 +79,10 @@ public class UserController {
 
         return ResponseEntity.ok(userInfo);
     }
+    @GetMapping("role/{role}")
+    public ResponseEntity<List<UserDto>> getUserByRole(@PathVariable String role){
+        List<UserDto> userByRole = this.userService.getUserByRole(role);
+        return  new ResponseEntity<>(userByRole, HttpStatus.OK);
+    }
 
 }

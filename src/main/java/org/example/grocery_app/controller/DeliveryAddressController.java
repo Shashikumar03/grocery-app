@@ -30,4 +30,10 @@ public class DeliveryAddressController {
         List<DeliveryAddressDto> userAllDeliveryAddresses = this.deliveryAddressService.getUserAllDeliveryAddresses(userId);
         return  new ResponseEntity<>(userAllDeliveryAddresses, HttpStatus.OK);
     }
+
+    @PutMapping("update/{deliveryAddressId}")
+    public  ResponseEntity<DeliveryAddressDto> updateDeliveryAddress(@PathVariable Long deliveryAddressId, @Validated @RequestBody DeliveryAddressDto deliveryAddressDto){
+        DeliveryAddressDto deliveryAddressDto1 = this.deliveryAddressService.updateDeliveryAddress(deliveryAddressId, deliveryAddressDto);
+        return  new ResponseEntity<>(deliveryAddressDto1, HttpStatus.OK);
+    }
 }

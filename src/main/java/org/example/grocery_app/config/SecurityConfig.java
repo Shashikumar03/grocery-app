@@ -5,6 +5,7 @@ package org.example.grocery_app.config;
 
 import org.example.grocery_app.security.JwtAuthenticationEntryPoint;
 import org.example.grocery_app.security.JwtAuthenticationFilter;
+import org.example.grocery_app.serviceImplementation.CustomLogoutHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,9 @@ public class SecurityConfig {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private CustomLogoutHandler customLogoutHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
@@ -41,7 +45,13 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
                 .and().exceptionHandling(ex -> ex.authenticationEntryPoint(point))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .logout(logout -> logout
+                        .addLogoutHandler(customLogoutHandler) // Custom logout handler to blacklist token
+                        .logoutUrl("/logout") // Logout URL
+                        .permitAll()
+                );
+
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
 

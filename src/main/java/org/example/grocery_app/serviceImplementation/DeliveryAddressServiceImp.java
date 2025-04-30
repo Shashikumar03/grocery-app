@@ -6,6 +6,7 @@ import org.example.grocery_app.dto.DeliveryAddressDto;
 import org.example.grocery_app.dto.UserDto;
 import org.example.grocery_app.entities.DeliveryAddress;
 import org.example.grocery_app.entities.User;
+import org.example.grocery_app.exception.ApiException;
 import org.example.grocery_app.exception.ResourceNotFoundException;
 import org.example.grocery_app.repository.DeliveryAddressRepository;
 import org.example.grocery_app.repository.UserRepository;
@@ -63,4 +64,28 @@ public class DeliveryAddressServiceImp implements DeliveryAddressService {
 
         return list;
     }
+
+    @Override
+    public DeliveryAddressDto updateDeliveryAddress(Long deliveryAddressId, DeliveryAddressDto deliveryAddressDto) {
+
+        DeliveryAddress deliveryAddress = this.deliveryAddressRepository.findByDeliveryAddressId(deliveryAddressId).orElseThrow(() -> new ResourceNotFoundException("Delivery Address", "DeliveryAddressId", deliveryAddressId));
+        User user = this.userRepository.findById(deliveryAddressDto.getUserId()).orElseThrow(() -> new ResourceNotFoundException("User", "UserId", deliveryAddressDto.getUserId()));
+        if(deliveryAddress.getUser().getId()!=user.getId()){
+            throw  new ApiException("User not belongs to this Address and Address Id: "+ deliveryAddressId+ " userId :"+ user.getId());
+        }
+        deliveryAddress.setAddress(deliveryAddressDto.getAddress());
+        deliveryAddress.setCity(deliveryAddressDto.getCity());
+        deliveryAddress.setLandmark(deliveryAddressDto.getLandmark());
+        deliveryAddress.setMobile(deliveryAddressDto.getMobile());
+        deliveryAddress.setPin(deliveryAddressDto.getPin());
+        deliveryAddress.setState(deliveryAddressDto.getState());
+        deliveryAddress.setUser(user);
+
+        DeliveryAddress deliveryAddressSave = this.deliveryAddressRepository.save(deliveryAddress);
+        DeliveryAddressDto saveDeliveryAddressDto = this.modelMapper.map(deliveryAddressSave, DeliveryAddressDto.class);
+        saveDeliveryAddressDto.setUserId(deliveryAddressDto.getUserId());
+        return  saveDeliveryAddressDto;
+
+    }
+
 }

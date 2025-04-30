@@ -67,7 +67,7 @@ public class CartServiceImplementation implements CartService {
     public CartDto addProductToCart(Long userId, CartItemDto cartItemDto) {
         System.out.println("shashi");
 
-        this.securityUtils.validateUserAccess(userId, this.request);
+        this.securityUtils.validateUserAccess(userId, request);
         // Fetch the user from the repository
         User user = this.userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
@@ -156,7 +156,7 @@ public class CartServiceImplementation implements CartService {
     @Override
     public CartDto removeProductFromCart(Long userId, Long productId) {
 
-        this.securityUtils.validateUserAccess(userId,request);
+        this.securityUtils.validateUserAccess(userId,this.request);
 
         // Fetch the user from the repository
         User user = this.userRepository.findById(userId)
@@ -220,6 +220,7 @@ public class CartServiceImplementation implements CartService {
         cartDto.setCartTotalPrice((cart.getTotalPricesOfAllProduct()));
 
         System.out.println(cartDto);
+        log.info("cartDto :{}", cartDto);
         return cartDto;
 
 

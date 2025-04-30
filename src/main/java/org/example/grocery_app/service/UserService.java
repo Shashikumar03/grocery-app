@@ -25,4 +25,6 @@ public interface UserService {
     void deleteUser(Long userId);
 
     UserDto getUserByEmail(String email);
+
+    List<UserDto> getUserByRole(String role);
 }

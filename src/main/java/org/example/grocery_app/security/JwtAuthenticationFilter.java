@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 
 //import org.example.library.exceptions.ApiException;
+import org.example.grocery_app.serviceImplementation.TokenBlacklistServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserDetailsService userDetailsService;
+    @Autowired
+    private TokenBlacklistServiceImpl tokenBlacklistService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -54,8 +57,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
 
                 username = this.jwtHelper.getUsernameFromToken(token);
-                logger.info("userName: "+username);
-                logger.info("token: "+token);
+                logger.info("userName1: "+username);
+                logger.info("token1: "+token);
 
 
 
@@ -102,6 +105,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Boolean validateToken = this.jwtHelper.validateToken(token, userDetails);
             logger.info("userDetails: "+userDetails);
             logger.info("validateToken: "+validateToken);
+
+            // Inside your JwtAuthenticationFilter.doFilterInternal
+
+            if (token != null) {
+                //  Check if blacklisted
+                if (tokenBlacklistService.isTokenBlacklisted(token)) {
+                    logger.info("Token is blacklisted. Rejecting request.");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Token has been expired or u logged out. Please login again.");
+                    return;
+                }
+            }
+
 
             if (validateToken) {
 

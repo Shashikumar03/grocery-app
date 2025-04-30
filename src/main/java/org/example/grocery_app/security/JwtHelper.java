@@ -18,7 +18,7 @@ import java.util.function.Function;
 public class JwtHelper {
 
     //requirement :
-    public static final long JWT_TOKEN_VALIDITY = 2 * 60 * 60;
+    public static final long JWT_TOKEN_VALIDITY = 10 * 60;
 
     //    public static final long JWT_TOKEN_VALIDITY =  60;
     private String secret = "afafasfafafasfasfasfafacasdasfasxASFACASDFACASDFASFASFDAFASFASDAADSCSDFADCVSGCFVADXCcadwavfsfarvf";
@@ -75,6 +75,11 @@ public class JwtHelper {
 //    public User getUserFromToken(String token) {
 //        return getClaimFromToken(token, claims -> claims.get("user", User.class));
 //    }
+
+    public long getExpirationTimeInMillis(String token) {
+        Date expirationDate = getExpirationDateFromToken(token);
+        return expirationDate.getTime(); // returns milliseconds
+    }
 
 
     //while creating the token -

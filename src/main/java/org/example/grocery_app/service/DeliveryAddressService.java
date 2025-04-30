@@ -10,4 +10,6 @@ public interface DeliveryAddressService {
     DeliveryAddressDto createNewDeliveryAddress(Long userId, DeliveryAddressDto deliveryAddressDto);
     List<DeliveryAddressDto> getUserAllDeliveryAddresses(Long userId);
 
+    DeliveryAddressDto updateDeliveryAddress(Long deliveryAddressId, DeliveryAddressDto deliveryAddressDto);
+
 }
