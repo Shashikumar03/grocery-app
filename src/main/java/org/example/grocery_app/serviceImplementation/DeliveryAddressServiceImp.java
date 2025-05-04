@@ -10,7 +10,7 @@ import org.example.grocery_app.exception.ApiException;
 import org.example.grocery_app.exception.ResourceNotFoundException;
 import org.example.grocery_app.repository.DeliveryAddressRepository;
 import org.example.grocery_app.repository.UserRepository;
-import org.example.grocery_app.security.SecurityUtils;
+//import org.example.grocery_app.security.SecurityUtils;
 import org.example.grocery_app.service.DeliveryAddressService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +31,13 @@ public class DeliveryAddressServiceImp implements DeliveryAddressService {
     @Autowired
     private HttpServletRequest request;
 
-    @Autowired
-    private SecurityUtils securityUtils;
+//    @Autowired
+//    private SecurityUtils securityUtils;
 
     @Override
     public DeliveryAddressDto createNewDeliveryAddress(Long userId, DeliveryAddressDto deliveryAddressDto) {
 
-        this.securityUtils.validateUserAccess(userId, request);
+//        this.securityUtils.validateUserAccess(userId, request);
 
         User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user", "userId" ,userId));
 
@@ -56,7 +56,7 @@ public class DeliveryAddressServiceImp implements DeliveryAddressService {
 
     @Override
     public List<DeliveryAddressDto> getUserAllDeliveryAddresses(Long userId) {
-        this.securityUtils.validateUserAccess(userId, request);
+//        this.securityUtils.validateUserAccess(userId, request);
         List<DeliveryAddress> listOfUserAddress = this.deliveryAddressRepository.findByUserId(userId);
         List<DeliveryAddressDto> list = listOfUserAddress.stream()
                 .map(address -> this.modelMapper.map(address, DeliveryAddressDto.class))

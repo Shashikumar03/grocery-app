@@ -14,7 +14,7 @@ import org.example.grocery_app.repository.CartRepository;
 import org.example.grocery_app.repository.ProductRepository;
 import org.example.grocery_app.repository.UserRepository;
 import org.example.grocery_app.security.JwtHelper;
-import org.example.grocery_app.security.SecurityUtils;
+//import org.example.grocery_app.security.SecurityUtils;
 import org.example.grocery_app.service.CartService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +57,8 @@ public class CartServiceImplementation implements CartService {
     @Autowired
     private HttpServletRequest request;
 
-    @Autowired
-    private SecurityUtils securityUtils;
+//    @Autowired
+//    private SecurityUtils securityUtils;
 
 
 
@@ -67,7 +67,7 @@ public class CartServiceImplementation implements CartService {
     public CartDto addProductToCart(Long userId, CartItemDto cartItemDto) {
         System.out.println("shashi");
 
-        this.securityUtils.validateUserAccess(userId, request);
+//        this.securityUtils.validateUserAccess(userId, request);
         // Fetch the user from the repository
         User user = this.userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
@@ -156,7 +156,7 @@ public class CartServiceImplementation implements CartService {
     @Override
     public CartDto removeProductFromCart(Long userId, Long productId) {
 
-        this.securityUtils.validateUserAccess(userId,this.request);
+//        this.securityUtils.validateUserAccess(userId,this.request);
 
         // Fetch the user from the repository
         User user = this.userRepository.findById(userId)
@@ -210,7 +210,7 @@ public class CartServiceImplementation implements CartService {
 
     @Override
     public CartDto viewUserCart(Long userId) {
-        this.securityUtils.validateUserAccess(userId,request);
+//        this.securityUtils.validateUserAccess(userId,request);
         User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
         Cart cart = this.cartRepository.findByUserAndStatus(user, CartStatus.ACTIVE).orElseThrow(() -> new ApiException("no cart found for this user " + userId));
         System.out.println(cart);

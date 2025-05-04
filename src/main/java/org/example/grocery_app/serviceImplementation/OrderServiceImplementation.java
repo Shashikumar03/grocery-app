@@ -13,7 +13,7 @@ import org.example.grocery_app.entities.*;
 import org.example.grocery_app.exception.ApiException;
 import org.example.grocery_app.exception.ResourceNotFoundException;
 import org.example.grocery_app.repository.*;
-import org.example.grocery_app.security.SecurityUtils;
+//import org.example.grocery_app.security.SecurityUtils;
 import org.example.grocery_app.service.OrderService;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
@@ -59,8 +59,8 @@ public class OrderServiceImplementation implements OrderService {
     @Autowired
     private HttpServletRequest request;
 
-    @Autowired
-    private SecurityUtils securityUtils;
+//    @Autowired
+//    private SecurityUtils securityUtils;
 
     @PostConstruct
     public void initRazorpayClient() {
@@ -76,7 +76,7 @@ public class OrderServiceImplementation implements OrderService {
     @Transactional
     public OrderDto createOrder(Long userId, Long deliveryAddressId) {
 
-        this.securityUtils.validateUserAccess(userId, request);
+//        this.securityUtils.validateUserAccess(userId, request);
 
         User user = getUserById(userId);
         log.info("User found successfully :{}",user);
@@ -291,6 +291,13 @@ public class OrderServiceImplementation implements OrderService {
            return orderDto;
        }).collect(Collectors.toList());
 
+    }
+
+    @Override
+    public OrderDto getOrderById(Long orderId) {
+        Order order = this.orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("order", "orderId", orderId));
+        log.info("order by order id : {}", order);
+        return null;
     }
 
 }

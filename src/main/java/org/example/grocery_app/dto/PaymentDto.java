@@ -14,8 +14,10 @@ import java.time.LocalDateTime;
 @ToString
 public class PaymentDto {
 
-    private Long paymentId;
+    private Long id;
     private String rozerpayId;
+
+    private String paymentId;
 
 
     private OrderDto orderDto;

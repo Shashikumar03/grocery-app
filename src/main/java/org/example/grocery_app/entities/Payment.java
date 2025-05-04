@@ -30,6 +30,10 @@ public class Payment {
     private LocalDateTime paymentTime;
 
     private String rozerpayId;
+//    this razorpay id is order_id
+
+
+    private String paymentId;
 
 
 
