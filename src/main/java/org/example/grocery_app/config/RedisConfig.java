@@ -27,17 +27,33 @@ package org.example.grocery_app.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration
 public class RedisConfig {
 
-    // This method defines the RedisTemplate bean,
-    // allowing Spring Boot's auto-configuration to handle the connection details
+    @Bean
+    public JedisConnectionFactory jedisConnectionFactory() {
+        // Set up the Jedis connection factory
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxTotal(128);  // Optional: max connections to Redis
+        poolConfig.setMaxIdle(128);   // Optional: max idle connections
+        poolConfig.setMinIdle(16);    // Optional: min idle connections
+
+        JedisConnectionFactory factory = new JedisConnectionFactory(poolConfig);
+        // You can directly use your Redis URL and credentials
+        factory.setHostName("caboose.proxy.rlwy.net");
+        factory.setPort(11489);
+        factory.setPassword("DiLALaSGLbOxOVmLWqBpwWpxtoBWATUE");
+        return factory;
+    }
+
     @Bean
     public RedisTemplate<String, String> redisTemplate() {
-        // Using StringRedisTemplate to simplify Redis interactions.
-        return new StringRedisTemplate();
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        return template;
     }
 }
