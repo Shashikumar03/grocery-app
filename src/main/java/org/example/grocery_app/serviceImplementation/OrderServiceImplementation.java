@@ -231,6 +231,11 @@ public class OrderServiceImplementation implements OrderService {
                 throw  new ApiException(name+":is out of stock, Available qty : "+inventory.getStockQuantity());
 
             }
+            if(updatedQuantity==0){
+                inventory.getProduct().setAvailable(false);
+
+
+            }
             inventory.setStockQuantity(updatedQuantity);
             Inventory save = inventoryRepository.save(inventory);
             log.info("Inventory after updating  the items :{}",save);
