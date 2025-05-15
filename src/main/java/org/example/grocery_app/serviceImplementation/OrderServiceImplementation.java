@@ -70,6 +70,8 @@ public class OrderServiceImplementation implements OrderService {
     @Autowired
     private PaymentGatewayService paymentGatewayService;
 
+    @Autowired ProductRepository productRepository;
+
     @PostConstruct
     public void initRazorpayClient() {
         try {
@@ -233,6 +235,9 @@ public class OrderServiceImplementation implements OrderService {
             }
             if(updatedQuantity==0){
                 inventory.getProduct().setAvailable(false);
+//                handle this
+                this.productRepository.save(inventory.getProduct());
+                log.info("Product marked as unavailable due to zero stock: {}", inventory.getProduct().getName());
 
 
             }
