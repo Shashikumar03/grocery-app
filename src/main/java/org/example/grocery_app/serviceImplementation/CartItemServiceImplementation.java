@@ -30,29 +30,26 @@ public class CartItemServiceImplementation implements CartItemService {
 
     @Override
     public CartItemDto updateCartItem(Long cartItemId, String action) {
-        CartItem cartItem = this.cartItemRepository.findById(cartItemId).orElseThrow(() -> new ResourceNotFoundException("cartItem", "cartItemId", cartItemId));
-        // Check the action against the Action enum
+        CartItem cartItem = this.cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("cartItem", "cartItemId", cartItemId));
+
         if (Action.ADD.name().equalsIgnoreCase(action)) {
-            // Perform the logic for adding
-            cartItem.setQuantity(cartItem.getQuantity() + 1);
+            cartItem.incrementQuantity();
         } else if (Action.DEC.name().equalsIgnoreCase(action)) {
-            // Perform the logic for removing
-            cartItem.setQuantity(cartItem.getQuantity() - 1);
-            if (cartItem.getQuantity() <= 0) {
+            try {
+                cartItem.decrementQuantity();
+            } catch (IllegalStateException e) {
                 this.cartItemRepository.delete(cartItem);
-                throw  new  ApiException("this product is removed");
+                throw new ApiException("Quantity cannot be zero");
             }
         } else {
             throw new ApiException("Invalid action: " + action);
         }
 
-        // Save the updated cartItem
         CartItem updatedCartItem = this.cartItemRepository.save(cartItem);
-
-        // Convert the updated cart item to CartItemDto and return
         return this.helperMethod.changeCartItemIntoCartItemDto(updatedCartItem);
-
     }
+
 
     @Override
     public CartItemDto getCartItemByProductId(Long productId) {

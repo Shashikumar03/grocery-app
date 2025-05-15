@@ -3,6 +3,7 @@ package org.example.grocery_app.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.grocery_app.exception.ApiException;
 
 @Entity
 @AllArgsConstructor
@@ -11,6 +12,7 @@ import lombok.*;
 @Setter
 @ToString(exclude = "cart")
 public class CartItem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,5 +30,17 @@ public class CartItem {
 
     public double getTotalPrice() {
         return this.quantity * product.getPrice();
+    }
+
+    public void incrementQuantity() {
+        this.quantity++;
+    }
+
+    public void decrementQuantity() {
+        if (this.quantity > 1) {
+            this.quantity--;
+        } else {
+            throw new ApiException("Quantity cannot go below 1");
+        }
     }
 }

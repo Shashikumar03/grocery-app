@@ -22,7 +22,7 @@ public class Inventory {
     private Product product;
 //    private Products
 
-    @Min(value = 0, message = "Stock quantity cannot be negative")
+    @Min(value = 0, message = "Out of Stock")
     private int stockQuantity;
 
     @Min(value = 0, message = "Stock reservedStock cannot be negative")

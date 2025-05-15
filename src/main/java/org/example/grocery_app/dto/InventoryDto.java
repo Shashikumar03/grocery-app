@@ -12,7 +12,7 @@ public class InventoryDto {
     private Long id;
 
     private ProductDto productDto; // Product reference by ID in DTO
-    @Min(value = 0, message = "Stock quantity cannot be negative")
+    @Min(value = 0, message = "Stock quantity cannot be negative or OUT of STOCK")
     private int stockQuantity;
     private int reservedStock;
 }

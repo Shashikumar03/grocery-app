@@ -99,7 +99,7 @@ public class OrderServiceImplementation implements OrderService {
         validateCartItems(cart);
         log.info("Card validate successfully}");
 //        double discountAmount = cart.getDiscountAmount();
-
+//        handle the inventory also available or not
         Order order = initializeOrder(user, cart);
 
 //        Setting address of in the order
@@ -222,10 +222,15 @@ public class OrderServiceImplementation implements OrderService {
         });
 
         List<Inventory> inventories = inventoryRepository.findAllById(inventoryIds);
-        log.info("all inventries that has to be update :{}",inventories);
+        log.info("all inventories that has to be update :{}",inventories);
 
         inventories.forEach(inventory -> {
             int updatedQuantity = inventory.getStockQuantity() - inventoryQuantityMap.get(inventory);
+            if(updatedQuantity<0){
+                String name = inventory.getProduct().getName();
+                throw  new ApiException(name+":is out of stock, Available qty : "+inventory.getStockQuantity());
+
+            }
             inventory.setStockQuantity(updatedQuantity);
             Inventory save = inventoryRepository.save(inventory);
             log.info("Inventory after updating  the items :{}",save);

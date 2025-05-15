@@ -77,7 +77,9 @@ public class CartServiceImplementation implements CartService {
         // Fetch the product from the repository
         Product product = this.productRepository.findById(cartItemDto.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", cartItemDto.getProductId()));
-
+        if(!product.isAvailable()){
+            throw  new ApiException(" product is OUT OF STOCK");
+        }
         Inventory inventory = product.getInventory();
 
         // Check if the user already has a cart
