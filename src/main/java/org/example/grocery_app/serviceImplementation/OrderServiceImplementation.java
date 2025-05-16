@@ -368,6 +368,9 @@ public class OrderServiceImplementation implements OrderService {
             for (CartItem item : cart.getCartItems()) {
                 Inventory inventory = item.getProduct().getInventory();
                 int newStock = inventory.getStockQuantity() + item.getQuantity();
+                if (newStock > 0 && !item.getProduct().isAvailable()) {
+                    item.getProduct().setAvailable(true);
+                }
                 inventory.setStockQuantity(newStock);
                 inventoryRepository.save(inventory);
                 log.info("Restored {} units to inventory for product ID: {}", item.getQuantity(), item.getProduct().getId());
