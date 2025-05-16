@@ -38,9 +38,9 @@ public class RedisConfig {
     public JedisConnectionFactory jedisConnectionFactory() {
         // Set up the Jedis connection factory
         JedisPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setMaxTotal(128);  // Optional: max connections to Redis
-        poolConfig.setMaxIdle(128);   // Optional: max idle connections
-        poolConfig.setMinIdle(16);    // Optional: min idle connections
+        poolConfig.setMaxTotal(128);
+        poolConfig.setMaxIdle(128);
+        poolConfig.setMinIdle(16);
 
         JedisConnectionFactory factory = new JedisConnectionFactory(poolConfig);
         // You can directly use your Redis URL and credentials

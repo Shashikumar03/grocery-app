@@ -3,6 +3,7 @@ package org.example.grocery_app.dto;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -12,7 +13,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class CategoryDto {
+public class CategoryDto  implements Serializable {
 
     private Long id;
 

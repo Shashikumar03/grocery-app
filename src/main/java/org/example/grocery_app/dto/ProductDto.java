@@ -7,11 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.example.grocery_app.entities.Inventory;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ProductDto {
+public class ProductDto implements Serializable {
 
     private Long id;
 

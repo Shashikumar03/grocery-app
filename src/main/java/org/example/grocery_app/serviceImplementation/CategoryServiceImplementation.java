@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.cache.annotation.Cacheable;
+
 
 @Service
 @Slf4j
@@ -117,8 +119,9 @@ public class CategoryServiceImplementation implements CategoryService {
     }
 
     @Override
+    @Cacheable(value = "categories")
     public List<CategoryDto> getAllCategories() {
-
+        log.info("Fetching from the Database");
         List<Category> listOfCategory = this.categoryRepository.findAll();
         return listOfCategory.stream().map(category -> {
             CategoryDto categoryDto = this.modelMapper.map(category, CategoryDto.class);
