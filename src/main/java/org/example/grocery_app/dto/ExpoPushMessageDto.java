@@ -9,7 +9,7 @@ import java.util.Map;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExpoPushMessage {
+public class ExpoPushMessageDto {
     private String to;
     private String sound = "default";
     private String title;
