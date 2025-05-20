@@ -3,11 +3,13 @@ package org.example.grocery_app.entities;
 //package com.example.grocery_app.model;
 
 import jakarta.persistence.*;
+import lombok.ToString;
 
 //import javax.persistence.*;
 
 @Entity
 @Table(name = "device_tokens")
+@ToString
 public class DeviceToken {
 
     @Id
@@ -19,6 +21,26 @@ public class DeviceToken {
 
     @Column(nullable = false)
     private String userId;
+
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    private String mobile;
 
     public DeviceToken() {}
 
