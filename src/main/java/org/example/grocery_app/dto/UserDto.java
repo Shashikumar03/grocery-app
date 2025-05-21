@@ -30,9 +30,9 @@ public class UserDto {
     @Email(message = "Invalid email address")
     private String email;
 
-    @NotBlank(message = "Address is required")
-    @Size(min = 10, max = 100, message = "Address must be between 10 and 100 characters")
-    private String address;
+//    @NotBlank(message = "Address is required")
+//    @Size(min = 10, max = 100, message = "Address must be between 10 and 100 characters")
+//    private String address;
 
     @NotBlank(message = "Role is required")
     @Pattern(regexp = "^(ADMIN|USER)$", message = "Role must be either 'ADMIN' or 'USER'")
