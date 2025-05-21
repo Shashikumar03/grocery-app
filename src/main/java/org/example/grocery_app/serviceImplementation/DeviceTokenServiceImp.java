@@ -10,10 +10,10 @@ import org.example.grocery_app.entities.User;
 import org.example.grocery_app.exception.ResourceNotFoundException;
 import org.example.grocery_app.repository.DeviceTokenRepository;
 import org.example.grocery_app.repository.UserRepository;
+import org.example.grocery_app.service.DeviceTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class DeviceTokenService {
+public class DeviceTokenServiceImp implements DeviceTokenService {
 
 //    private final DeviceTokenRepository tokenRepository;
     private final RestTemplate restTemplate = new RestTemplate();
@@ -36,6 +36,7 @@ public class DeviceTokenService {
     @Autowired
     private DeviceTokenRepository deviceTokenRepository;
 
+    @Override
     public void saveOrUpdateToken(String userId, String token) {
         Optional<DeviceToken> existingTokenByUser = deviceTokenRepository.findByUserId(userId);
         Optional<DeviceToken> existingTokenByToken = deviceTokenRepository.findByToken(token);
@@ -73,6 +74,7 @@ public class DeviceTokenService {
         }
     }
 
+    @Override
     public void sendPushToAllUsers(String title, String body, Map<String, Object> data) {
         List<String> tokens = deviceTokenRepository.findAllTokens();
 
