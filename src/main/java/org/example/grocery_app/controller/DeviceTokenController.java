@@ -2,7 +2,7 @@ package org.example.grocery_app.controller;//package com.example.grocery_app.con
 
 //import com.example.grocery_app.service.DeviceTokenService;
 import lombok.extern.slf4j.Slf4j;
-import org.example.grocery_app.serviceImplementation.DeviceTokenService;
+import org.example.grocery_app.serviceImplementation.DeviceTokenServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ import java.util.Map;
 public class DeviceTokenController {
 
     @Autowired
-    private DeviceTokenService deviceTokenService;
+    private DeviceTokenServiceImp deviceTokenServiceImp;
 
     @PostMapping("/device-token")
     public ResponseEntity<String> saveToken(@RequestBody Map<String, String> request) {
@@ -27,7 +27,7 @@ public class DeviceTokenController {
             return ResponseEntity.badRequest().body("Missing token or userId");
         }
 
-        deviceTokenService.saveOrUpdateToken(userId, token);
+        deviceTokenServiceImp.saveOrUpdateToken(userId, token);
         return ResponseEntity.ok("Token saved/updated successfully");
     }
 
@@ -39,7 +39,7 @@ public class DeviceTokenController {
         Map<String, Object> data = new HashMap<>();
         data.put("screen", "Home"); // optional extra payload
 
-        deviceTokenService.sendPushToAllUsers(title, body, data);
+        deviceTokenServiceImp.sendPushToAllUsers(title, body, data);
         return ResponseEntity.ok("Push notifications sent to all users.");
     }
 }
