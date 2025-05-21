@@ -50,7 +50,7 @@ public class UserServiceImplementation implements UserService {
         user.setName(userDto.getName());
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         user.setEmail(userDto.getEmail());
-        user.setAddress(userDto.getAddress());
+//        user.setAddress(userDto.getAddress());
         user.setRole(userDto.getRole());
         user.setPhoneNumber(userDto.getPhoneNumber());
         User saveUser = this.userRepository.save(user);
