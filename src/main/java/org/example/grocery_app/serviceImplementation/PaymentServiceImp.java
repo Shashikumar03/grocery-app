@@ -32,6 +32,7 @@ public class PaymentServiceImp implements PaymentService {
             Order order = razorpay.getOrder();
             order.setState("COMPLETED");
             razorpay.setOrder(order);
+            order.setPayment(razorpay);
 
 
         }
