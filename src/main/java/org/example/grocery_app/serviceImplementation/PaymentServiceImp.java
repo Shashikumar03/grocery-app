@@ -6,6 +6,7 @@ import org.example.grocery_app.entities.Order;
 import org.example.grocery_app.entities.Payment;
 import org.example.grocery_app.exception.ApiException;
 import org.example.grocery_app.exception.ResourceNotFoundException;
+import org.example.grocery_app.repository.OrderRepository;
 import org.example.grocery_app.repository.PaymentRepository;
 import org.example.grocery_app.service.PaymentService;
 import org.modelmapper.ModelMapper;
@@ -20,6 +21,8 @@ public class PaymentServiceImp implements PaymentService {
     private PaymentRepository paymentRepository;
 
     @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
     private ModelMapper modelMapper;
     @Override
     public PaymentDto updatePayment(String razorpayId,String paymentStatus, String paymentId) {
@@ -33,7 +36,7 @@ public class PaymentServiceImp implements PaymentService {
             order.setState("COMPLETED");
             razorpay.setOrder(order);
             order.setPayment(razorpay);
-
+            this.orderRepository.save(order);
 
         }
 
