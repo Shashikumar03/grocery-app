@@ -392,7 +392,7 @@ public class OrderServiceImplementation implements OrderService {
         if (payment != null && Objects.equals(payment.getPaymentMode(), PaymentMode.ONLINE.name()) &&
                 ("COMPLETED".equalsIgnoreCase(payment.getPaymentStatus()) ||
                         "CREATED".equalsIgnoreCase(payment.getPaymentStatus()))) {
-
+//            ydi online payment nhi huya hai to refund kaise de skte hai
             if ("CREATED".equalsIgnoreCase(payment.getPaymentStatus())) {
                 log.warn("Payment not completed for payment ID: {}. Refund not allowed.", payment.getRozerpayId());
                 throw new ApiException("Payment has not been completed for payment ID: " + payment.getRozerpayId() + ", so unable to perform the refund.");
@@ -405,6 +405,7 @@ public class OrderServiceImplementation implements OrderService {
             payment.setRefundAmount(refundAmount);
             payment.setRefundInitiated(false);
             payment.setPaymentNotes("Order cancelled. Within 2-5 working days.");
+
             this.paymentGatewayService.initiatePartialRefund(payment.getPaymentId(), refundAmount);
             paymentRepository.save(payment);
 
