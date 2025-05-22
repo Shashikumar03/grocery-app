@@ -21,7 +21,7 @@ public class PaymentGatewayServiceImp implements PaymentGatewayService {
         try {
             RazorpayClient client = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
 
-            double refundAmount = totalAmount * 0.90;
+            double refundAmount = totalAmount * 1;
             int refundAmountInPaise = (int) (refundAmount * 100);
 
             JSONObject options = new JSONObject();
