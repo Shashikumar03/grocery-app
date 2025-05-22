@@ -2,6 +2,7 @@ package org.example.grocery_app.serviceImplementation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.grocery_app.dto.PaymentDto;
+import org.example.grocery_app.entities.Order;
 import org.example.grocery_app.entities.Payment;
 import org.example.grocery_app.exception.ApiException;
 import org.example.grocery_app.exception.ResourceNotFoundException;
@@ -27,11 +28,19 @@ public class PaymentServiceImp implements PaymentService {
         if (!"COMPLETED".equals(paymentStatus) && !"PENDING".equals(paymentStatus) && !"FAILED".equals(paymentStatus)) {
             throw new ApiException("payment status should be ACTIVE or PENDING");
         }
+        if(razorpay.getPaymentMode()=="CASH_ON_DELIVERY"){
+            Order order = razorpay.getOrder();
+            order.setState("COMPLETED");
+            razorpay.setOrder(order);
+
+
+        }
 
         razorpay.setPaymentStatus(paymentStatus);
         razorpay.setPaymentId(paymentId);
         Payment save = this.paymentRepository.save(razorpay);
         log.info("payment service save :{}", save);
+
        return this.modelMapper.map(save, PaymentDto.class);
 
 
