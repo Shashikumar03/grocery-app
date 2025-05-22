@@ -2,6 +2,7 @@
 package org.example.grocery_app.serviceImplementation;
 
 import com.razorpay.*;
+import org.example.grocery_app.exception.ApiException;
 import org.example.grocery_app.service.PaymentGatewayService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +33,8 @@ public class PaymentGatewayServiceImp implements PaymentGatewayService {
             return "Refund initiated: " + refund.get("id");
         } catch (RazorpayException e) {
             e.printStackTrace();
-            return "Refund failed: " + e.getMessage();
+            throw  new ApiException(e.getMessage());
+//            return "Refund failed: " + e.getMessage();
         }
     }
 }
