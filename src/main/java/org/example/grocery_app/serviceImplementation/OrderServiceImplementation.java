@@ -63,6 +63,9 @@ public class OrderServiceImplementation implements OrderService {
 
     @Autowired
     private HttpServletRequest request;
+//
+//    @Autowired
+//    private  PaymentGatewayService paymentGatewayService;
 
 //    @Autowired
 //    private SecurityUtils securityUtils;
@@ -397,10 +400,12 @@ public class OrderServiceImplementation implements OrderService {
 
             double paymentAmount = payment.getPaymentAmount();
             double refundAmount = paymentAmount;
+
             payment.setRefundStatus("WAITING_FOR_RETURN");
             payment.setRefundAmount(refundAmount);
             payment.setRefundInitiated(false);
             payment.setPaymentNotes("Order cancelled. Within 2-5 working days.");
+            this.paymentGatewayService.initiatePartialRefund(payment.getPaymentId(), refundAmount);
             paymentRepository.save(payment);
 
             log.info("Refund of ₹{} scheduled for payment ID: {} (after 10% deduction)", refundAmount, payment.getRozerpayId());
