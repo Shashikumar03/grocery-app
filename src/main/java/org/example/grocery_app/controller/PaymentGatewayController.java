@@ -22,7 +22,7 @@ public class PaymentGatewayController {
     private PaymentRepository paymentRepository;
 
 
-    @PostMapping("/partial/{paymentId}")
+    @PostMapping("/full/{paymentId}")
     public ResponseEntity<String> refundPartial(@PathVariable String paymentId) {
         Payment payment = paymentRepository.findByPaymentId(paymentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment", "paymentId", 0));
