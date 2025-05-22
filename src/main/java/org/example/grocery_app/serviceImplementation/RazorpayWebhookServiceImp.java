@@ -92,6 +92,7 @@ public class RazorpayWebhookServiceImp implements RazorpayWebhookService {
                 // Update status based on refund amount
                 if (refundAmount < payment.getPaymentAmount()) {
                     payment.setPaymentStatus("PARTIALLY_REFUNDED");
+
                 } else {
                     payment.setPaymentStatus("REFUNDED");
                 }
