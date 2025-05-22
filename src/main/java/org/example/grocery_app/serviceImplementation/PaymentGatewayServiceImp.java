@@ -32,7 +32,7 @@ public class PaymentGatewayServiceImp implements PaymentGatewayService {
 
             return "Refund initiated: " + refund.get("id");
         } catch (RazorpayException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             throw  new ApiException(e.getMessage());
 //            return "Refund failed: " + e.getMessage();
         }
