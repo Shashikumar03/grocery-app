@@ -25,31 +25,34 @@ public class PaymentServiceImp implements PaymentService {
     @Autowired
     private ModelMapper modelMapper;
     @Override
-    public PaymentDto updatePayment(String razorpayId,String paymentStatus, String paymentId) {
-        Payment razorpay = this.paymentRepository.findByRozerpayId(razorpayId).orElseThrow(() -> new ResourceNotFoundException("razorpay", "razorpayId: " + razorpayId, 0));
-        log.info("razorpay :{}",razorpay);
+    public PaymentDto updatePayment(String razorpayId, String paymentStatus, String paymentId) {
+        Payment razorpay = this.paymentRepository.findByRozerpayId(razorpayId)
+                .orElseThrow(() -> new ResourceNotFoundException("razorpay", "razorpayId: " + razorpayId, 0));
+
+        log.info("razorpay :{}", razorpay);
+
         if (!"COMPLETED".equals(paymentStatus) && !"PENDING".equals(paymentStatus) && !"FAILED".equals(paymentStatus)) {
-            throw new ApiException("payment status should be ACTIVE or PENDING");
+            throw new ApiException("payment status should be COMPLETED, PENDING or FAILED");
         }
-        if(razorpay.getPaymentMode()=="CASH_ON_DELIVERY"){
-            Order order = razorpay.getOrder();
+
+        Order order = razorpay.getOrder();
+
+        if ("CASH_ON_DELIVERY".equals(razorpay.getPaymentMode())) {
             order.setState("COMPLETED");
             razorpay.setOrder(order);
             order.setPayment(razorpay);
-            this.orderRepository.save(order);
-
+            this.orderRepository.save(order); // Save order changes
         }
 
         razorpay.setPaymentStatus(paymentStatus);
         razorpay.setPaymentId(paymentId);
         Payment save = this.paymentRepository.save(razorpay);
+
         log.info("payment service save :{}", save);
 
-       return this.modelMapper.map(save, PaymentDto.class);
-
-
-//        return null;
+        return this.modelMapper.map(save, PaymentDto.class);
     }
+
 
     @Override
     public PaymentDto findPaymentByOrderId(String rozarpayOrderId) {
