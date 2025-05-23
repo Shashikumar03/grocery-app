@@ -413,6 +413,9 @@ public class OrderServiceImplementation implements OrderService {
         } else if (payment != null && Objects.equals(payment.getPaymentMode(), PaymentMode.CASH_ON_DELIVERY.name()) &&
                 ("PENDING".equalsIgnoreCase(payment.getPaymentStatus()) ||
                         "CREATED".equalsIgnoreCase(payment.getPaymentStatus()))){
+            if(payment.getPaymentStatus()=="COMPLETED"){
+                throw  new ApiException("Item Delivered, Please refresh the Page");
+            }
             double paymentAmount = payment.getPaymentAmount();
             double refundAmount = paymentAmount;
             payment.setRefundStatus("WAITING_FOR_RETURN");
