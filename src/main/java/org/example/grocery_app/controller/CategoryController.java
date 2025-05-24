@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -43,6 +44,12 @@ public class CategoryController {
     public ResponseEntity<CategoryDto> addProductsToCategory( @Valid  @RequestBody AddProductRequestDto addProductRequestDto) {
         CategoryDto updatedCategoryDto = this.categoryService.addProductsToCategory(addProductRequestDto);
         return new ResponseEntity<>(updatedCategoryDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/list")
+    private ResponseEntity<List<CategoryDto>> allCategoryList(){
+        List<CategoryDto> allCategoriesName = this.categoryService.getAllCategoriesName();
+        return  new ResponseEntity<>(allCategoriesName, HttpStatus.OK);
     }
 
 

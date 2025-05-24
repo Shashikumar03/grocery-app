@@ -174,4 +174,15 @@ public class CategoryServiceImplementation implements CategoryService {
         return updatedCategoryDto;
 //        return null;
     }
+
+    @Override
+    public List<CategoryDto> getAllCategoriesName() {
+        List<Category> allCategory = categoryRepository.findAll();
+        List<CategoryDto> collect = allCategory.stream().map(category -> this.modelMapper.map(category, CategoryDto.class)).collect(Collectors.toList());
+
+//        List<CategoryDto> categoryDtoList= new ArrayList<>();
+
+
+        return  collect;
+    }
 }
