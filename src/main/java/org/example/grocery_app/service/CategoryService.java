@@ -3,6 +3,7 @@ package org.example.grocery_app.service;
 import org.example.grocery_app.dto.AddProductRequestDto;
 import org.example.grocery_app.dto.CategoryDto;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface CategoryService {
@@ -13,5 +14,5 @@ public interface CategoryService {
     CategoryDto getCategoryById(Long id);
     void deleteCategoryById(int id);
     CategoryDto addProductsToCategory(AddProductRequestDto addProductRequestDto);
-
+    List<CategoryDto> getAllCategoriesName();
 }

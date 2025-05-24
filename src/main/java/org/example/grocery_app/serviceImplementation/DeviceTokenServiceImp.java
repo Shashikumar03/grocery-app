@@ -133,6 +133,7 @@ public class DeviceTokenServiceImp implements DeviceTokenService {
             }
             return chunks;
         }
+        
     private void sendPushMessage(List<ExpoPushMessageDto> messages) {
         List<List<ExpoPushMessageDto>> chunks = chunkList(messages, 100);
 
