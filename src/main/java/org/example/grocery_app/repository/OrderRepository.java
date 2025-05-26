@@ -26,6 +26,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByAdminNotifiedFalseAndOrderTimeAfterOrderByOrderTimeDesc(LocalDateTime time);
 
     List<Order> findByAdminNotifiedFalse(); // For debugging
+    List<Order> findByOrderTimeBetween(LocalDateTime start, LocalDateTime end);
 
     @Modifying
     @Transactional

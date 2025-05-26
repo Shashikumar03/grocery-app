@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -499,21 +500,24 @@ public class OrderServiceImplementation implements OrderService {
 
     @Override
     public List<OrderDetailsToAdminDto> getOrdersPlacedWithinLastMinute() {
-        LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
-        log.info("Start of today: {}", startOfToday);
+//        LocalDateTime oneMinuteAgo = LocalDateTime.now().minusMinutes(100);
+//        log.info("time :{}", oneMinuteAgo);
+//        log.info("Fetching orders placed after: {}", oneMinuteAgo);
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay(); // today at 00:00
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+        log.info("time :{}",startOfDay );
+        log.info("end date :{}", endOfDay);
+        // Fetch all unnotified orders placed in redisthe last minute
+        List<Order> recentOrders = orderRepository.findByOrderTimeBetween(startOfDay, endOfDay);
+        log.info("recent orders are :{}", recentOrders);
+        // Mark as notified
+//        for (Order order : recentOrders) {
+//            order.setAdminNotified(true);
+//        }
+//        orderRepository.saveAll(recentOrders);
 
-        // Fetch all unnotified orders placed today, sorted descending
-        List<Order> todaysOrders = orderRepository.findByAdminNotifiedFalseAndOrderTimeAfterOrderByOrderTimeDesc(startOfToday);
-        log.info("Today's unnotified orders: {}", todaysOrders);
-
-        // Mark orders as notified
-        for (Order order : todaysOrders) {
-            order.setAdminNotified(false); // <- mark as true
-        }
-        orderRepository.saveAll(todaysOrders);
-
-        // Group orders by user
-        Map<User, List<Order>> groupedByUser = todaysOrders.stream()
+        // Group by user
+        Map<User, List<Order>> groupedByUser = recentOrders.stream()
                 .collect(Collectors.groupingBy(Order::getUser));
 
         List<OrderDetailsToAdminDto> result = new ArrayList<>();
@@ -522,16 +526,20 @@ public class OrderServiceImplementation implements OrderService {
             User user = entry.getKey();
             List<Order> orders = entry.getValue();
 
-            UserDto userDto = this.modelMapper.map(user, UserDto.class); // You must implement this method
+            UserDto userDto = modelMapper.map(user, UserDto.class);
             List<OrderDto> orderDtos = orders.stream()
+                    .filter(order -> !"created".equalsIgnoreCase(order.getPayment().getPaymentStatus()) || "CASH_ON_DELIVERY".equalsIgnoreCase(order.getPayment().getPaymentMode()) && "created".equalsIgnoreCase(order.getPayment().getPaymentStatus()))
                     .map(this::convertToOrderDto)
                     .collect(Collectors.toList());
 
-            result.add(new OrderDetailsToAdminDto(userDto, orderDtos));
+            if (!orderDtos.isEmpty()) {
+                result.add(new OrderDetailsToAdminDto(userDto, orderDtos));
+            }
         }
 
         return result;
     }
+
 
     @Override
     public void updateStatus(Long orderId, String status) {
