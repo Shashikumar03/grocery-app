@@ -38,7 +38,9 @@ public class UserServiceImplementation implements UserService {
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         User save = this.userRepository.save(user);
         log.info("new created user :{}",save);
+        System.out.println("shashi");
         return this.modelMapper.map(save, UserDto.class);
+
 
     }
 
