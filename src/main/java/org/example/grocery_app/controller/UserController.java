@@ -1,7 +1,9 @@
 package org.example.grocery_app.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.grocery_app.dto.UserDto;
 import org.example.grocery_app.entities.User;
+import org.example.grocery_app.exception.ApiException;
 import org.example.grocery_app.security.JwtHelper;
 import org.example.grocery_app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -86,13 +89,20 @@ public class UserController {
         return  new ResponseEntity<>(userByRole, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/account/delete")
     public ResponseEntity<?> deleteMyAccount(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You must be logged in to delete your account");
         }
-        String userEmail = authentication.getName();
-        this.userService.deleteMyAccount(userEmail);
+       try {
+           String userEmail = authentication.getName();
+           log.info("userEmail :{}", userEmail);
+           this.userService.deleteMyAccount(userEmail);
+       }catch (Exception e){
+            throw  new ApiException("User not found");
+       }
+
+
         return ResponseEntity.ok("Account deleted successfully.");
     }
 
