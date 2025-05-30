@@ -1,14 +1,20 @@
 package org.example.grocery_app.controller;
 
+import org.example.grocery_app.component.PdfGenerator;
+import org.example.grocery_app.dto.HisabBookDto;
 import org.example.grocery_app.dto.OrderDetailsToAdminDto;
 import org.example.grocery_app.dto.OrderDto;
+import org.example.grocery_app.dto.PriceSettlementDto;
 import org.example.grocery_app.security.JwtHelper;
 import org.example.grocery_app.service.OrderService;
+import org.example.grocery_app.service.PriceSettlementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -19,6 +25,12 @@ public class AdminController {
     private  OrderService orderService;
     @Autowired
     private JwtHelper jwtHelper;
+
+    @Autowired
+    private PriceSettlementService priceSettlementService;
+
+    @Autowired
+    private PdfGenerator pdfGenerator;
 
     @PostMapping("/{paymentId}/confirm-return")
     public ResponseEntity<OrderDto> confirmGoodsReturnedAndInitiateRefund(@PathVariable Long paymentId) {
@@ -44,6 +56,39 @@ public class AdminController {
         }
 
         return jwtHelper.isTokenExpired(token);
+    }
+
+    @PostMapping("/amount-settlement-billing")
+    public ResponseEntity<List<HisabBookDto>> priceSettlement(){
+        List<HisabBookDto> hisabBookDtos = this.priceSettlementService.doSettlement();
+        return  new ResponseEntity<>(hisabBookDtos, HttpStatus.CREATED);
+    }
+
+
+
+    @GetMapping("/pdf/{date}")
+    public ResponseEntity<String> generatePdfReport(@PathVariable String date) {
+        try {
+            LocalDate reportDate = LocalDate.parse(date); // "2025-05-28"
+            List<HisabBookDto> settlements = priceSettlementService.getSettlementsByDate(reportDate);
+            String outputPath = "PriceSettlement_" + date + ".pdf";
+
+            pdfGenerator.generatePriceSettlementReport(reportDate, settlements, outputPath);
+
+            return ResponseEntity.ok("PDF generated: " + outputPath);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
+
+
+    }
+
+    @PostMapping("/mark-paid-to-shop-owner")
+    public ResponseEntity<String> markAsPaidToShopkeeper(
+            @RequestBody List<Long> settlementIds
+    ) {
+        priceSettlementService.updateSettlementStatusByShopOwner(settlementIds, true);
+        return ResponseEntity.ok("Selected settlements marked as paid to shopkeeper.");
     }
 
 }

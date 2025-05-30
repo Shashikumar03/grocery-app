@@ -27,7 +27,7 @@ public class Order {
 //    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 //    private List<OrderItem> items;
 //
-    private String OrderStatus; // PENDING, CONFIRMED, DISPATCHED, DELIVERED
+    private String orderStatus; // PENDING, CONFIRMED, DISPATCHED, DELIVERED
 //
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private Payment payment;

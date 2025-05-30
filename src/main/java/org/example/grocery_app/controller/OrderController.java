@@ -3,6 +3,7 @@ package org.example.grocery_app.controller;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.example.grocery_app.constant.PaymentMode;
+import org.example.grocery_app.dto.OrderDetailsToAdminDto;
 import org.example.grocery_app.dto.OrderDto;
 import org.example.grocery_app.entities.Order;
 import org.example.grocery_app.exception.ApiException;
@@ -58,6 +59,11 @@ public class OrderController {
         return ResponseEntity.ok("Order status updated to " + status);
     }
 
+    @GetMapping("/today-cancel-and_completed-order")
+    public ResponseEntity<List<OrderDetailsToAdminDto>> getTodayCancelledAndCompletedOrdersGroupedByUser(){
+        List<OrderDetailsToAdminDto> todayCancelledAndCompletedOrdersGroupedByUser = this.orderService.getTodayCancelledAndCompletedOrdersGroupedByUser();
+        return  new ResponseEntity<>(todayCancelledAndCompletedOrdersGroupedByUser,HttpStatus.OK);
+    }
 
 
 

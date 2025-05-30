@@ -18,12 +18,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Optional;
 import java.util.Random;
 
@@ -42,6 +42,9 @@ public class AuthServiceImplementation implements AuthService {
 
     @Autowired
     private JwtHelper helper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     @Autowired
@@ -78,7 +81,7 @@ public class AuthServiceImplementation implements AuthService {
     }
 
     @Override
-    public PasswordResetTokenDto resetPassword(String email) {
+    public PasswordResetTokenDto requestResetPassword(String email) {
         User user = this.userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email: " + email, 0));
         String otp = String.format("%06d", new Random().nextInt(999999));
@@ -118,6 +121,7 @@ public class AuthServiceImplementation implements AuthService {
             passwordResetToken.setUser(user);
 
             passwordResetToken.setOtp(otp);
+            passwordResetToken.setEmail(email);
             passwordResetToken.setCreatedTime(LocalDateTime.now());
             save = passwordResetTokenRepository.save(passwordResetToken);
         }
@@ -129,9 +133,36 @@ public class AuthServiceImplementation implements AuthService {
     }
 
     @Override
-    public boolean verifyResetOtp(HashMap<String, String> otpDetails) {
+    public void verifyResetOtp(String email, String otp, String password) {
+        Optional<PasswordResetToken>  resetTokenOP= passwordResetTokenRepository.findByEmail(email);
+        if(resetTokenOP.isEmpty()){
+            throw  new ApiException("Please send the otp first");
+        }
+        PasswordResetToken resetToken = resetTokenOP.get();
+        Duration duration = Duration.between(resetToken.getCreatedTime(), LocalDateTime.now());
+        long minutes = duration.toMinutes();
 
-        return false;
+        if(minutes>5){
+            throw  new ApiException("Otp is expire !! valid for 5Min Only");
+        }
+        if (!otp.equals(resetToken.getOtp())){
+            throw  new ApiException("Invalid Otp !!");
+
+        }else{
+            passwordResetTokenRepository.delete(resetToken);
+            User user = this.userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("email", "emailId: " + email, 0));
+            user.setPassword(passwordEncoder.encode(password));
+            this.userRepository.save(user);
+
+        }
+    }
+
+    @Override
+    public void resetPassword(String email, String password) {
+        User user = this.userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("email", "emailId: " + email, 0));
+        user.setPassword(passwordEncoder.encode(password));
+        this.userRepository.save(user);
+
     }
 
 

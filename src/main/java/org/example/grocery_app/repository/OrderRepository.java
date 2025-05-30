@@ -30,8 +30,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE Order o SET o.OrderStatus = :status WHERE o.id = :orderId")
+    @Query("UPDATE Order o SET o.orderStatus = :status WHERE o.id = :orderId")
     void updateOrderStatus(@Param("orderId") Long orderId, @Param("status") String status);
+
+    List<Order> findByOrderTimeBetweenAndOrderStatusIn(LocalDateTime start, LocalDateTime end, List<String> statuses);
+
+    @Query("SELECT o FROM Order o WHERE o.orderStatus = 'COMPLETED' AND o.orderTime BETWEEN :start AND :end")
+    List<Order> findCompletedOrdersToday(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
 
 }

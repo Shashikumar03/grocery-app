@@ -20,6 +20,9 @@ public class PasswordResetToken {
     @OneToOne
     private User user;
 
+    @Column(unique = true)
+    private String email;
+
     private String otp;
 
     private LocalDateTime createdTime;

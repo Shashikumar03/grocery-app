@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +84,16 @@ public class UserController {
     public ResponseEntity<List<UserDto>> getUserByRole(@PathVariable String role){
         List<UserDto> userByRole = this.userService.getUserByRole(role);
         return  new ResponseEntity<>(userByRole, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteMyAccount(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You must be logged in to delete your account");
+        }
+        String userEmail = authentication.getName();
+        this.userService.deleteMyAccount(userEmail);
+        return ResponseEntity.ok("Account deleted successfully.");
     }
 
 }
