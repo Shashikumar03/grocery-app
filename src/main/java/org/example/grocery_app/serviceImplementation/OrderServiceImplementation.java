@@ -528,6 +528,7 @@ public class OrderServiceImplementation implements OrderService {
 
             UserDto userDto = modelMapper.map(user, UserDto.class);
             List<OrderDto> orderDtos = orders.stream()
+                    .filter(order -> "PENDING".equalsIgnoreCase(order.getOrderStatus()))
                     .filter(order -> !"created".equalsIgnoreCase(order.getPayment().getPaymentStatus()) || "CASH_ON_DELIVERY".equalsIgnoreCase(order.getPayment().getPaymentMode()) && "created".equalsIgnoreCase(order.getPayment().getPaymentStatus()))
                     .map(this::convertToOrderDto)
                     .collect(Collectors.toList());
@@ -547,7 +548,36 @@ public class OrderServiceImplementation implements OrderService {
         orderRepository.updateOrderStatus(orderId, status);
     }
 
+    @Override
+    public List<OrderDetailsToAdminDto> getTodayCancelledAndCompletedOrdersGroupedByUser() {
 
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        List<String> validStatuses = Arrays.asList("CANCELLED", "COMPLETED");
+
+        List<Order> todayOrders = orderRepository.findByOrderTimeBetweenAndOrderStatusIn(startOfDay, endOfDay, validStatuses);
+        // Group by user
+        Map<User, List<Order>> ordersByUser = todayOrders.stream()
+                .collect(Collectors.groupingBy(Order::getUser));
+
+        List<OrderDetailsToAdminDto> response = new ArrayList<>();
+
+        for (Map.Entry<User, List<Order>> entry : ordersByUser.entrySet()) {
+            User user = entry.getKey();
+            List<Order> orders = entry.getValue();
+
+            UserDto userDto = modelMapper.map(user, UserDto.class);
+
+            List<OrderDto> orderDtos = orders.stream()
+                    .map(this::convertToOrderDto)
+                    .collect(Collectors.toList());
+
+            response.add(new OrderDetailsToAdminDto(userDto, orderDtos));
+        }
+
+        return response;
+    }
 
 
 }

@@ -27,4 +27,7 @@ public interface UserService {
     UserDto getUserByEmail(String email);
 
     List<UserDto> getUserByRole(String role);
+
+    void  deleteMyAccount(String  email);
+
 }

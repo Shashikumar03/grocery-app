@@ -146,6 +146,14 @@
             <version>9.1.1</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.itextpdf/itextpdf -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>8.0.3</version>
+            <type>pom</type>
+        </dependency>
+
     </dependencies>
 
     <build>

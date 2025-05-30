@@ -1,5 +1,6 @@
 package org.example.grocery_app.controller;
 
+import org.example.grocery_app.apiPayload.ApiResponse;
 import org.example.grocery_app.dto.PasswordResetTokenDto;
 import org.example.grocery_app.entities.User;
 import org.example.grocery_app.payload.JwtRequest;
@@ -34,9 +35,18 @@ public class AuthController {
 
     @PutMapping("reset/password")
     public ResponseEntity<PasswordResetTokenDto> resetPassword(@RequestParam  String email){
-        PasswordResetTokenDto passwordResetTokenDto = this.authService.resetPassword(email);
+        PasswordResetTokenDto passwordResetTokenDto = this.authService.requestResetPassword(email);
         return  new ResponseEntity<>(passwordResetTokenDto, HttpStatus.OK);
     }
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ApiResponse> verifyOtp(@RequestParam String email, @RequestParam String otp, @RequestParam String password){
+        this.authService.verifyResetOtp(email, otp,password);
+        return new ResponseEntity<>(new ApiResponse("password reset successfully", true), HttpStatus.OK);
+    }
+
+    
+
+
 
 
 

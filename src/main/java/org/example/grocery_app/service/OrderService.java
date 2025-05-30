@@ -21,6 +21,6 @@ public interface OrderService {
 
     public void updateStatus(Long orderId, String status);
 
-
+    List<OrderDetailsToAdminDto> getTodayCancelledAndCompletedOrdersGroupedByUser();
 
 }

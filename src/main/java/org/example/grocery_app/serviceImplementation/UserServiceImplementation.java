@@ -8,6 +8,7 @@ import org.example.grocery_app.repository.UserRepository;
 import org.example.grocery_app.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -90,5 +91,13 @@ public class UserServiceImplementation implements UserService {
         List<User> users = this.userRepository.findByRole(role).orElseThrow(() -> new ResourceNotFoundException("", "", 0));
 
         return users.stream().map((user -> this.modelMapper.map(user, UserDto.class))).toList();
+    }
+
+    @Override
+    public void deleteMyAccount(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "EmailId"+userEmail,0));
+
+        userRepository.delete(user);
     }
 }
