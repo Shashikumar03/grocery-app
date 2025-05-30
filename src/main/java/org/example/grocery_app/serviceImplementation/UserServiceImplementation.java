@@ -96,7 +96,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     public void deleteMyAccount(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "EmailId"+userEmail,0));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "ShashiId"+userEmail,0));
 
         userRepository.delete(user);
     }
