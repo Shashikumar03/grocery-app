@@ -75,4 +75,10 @@ public class ShopProductServiceImplementation implements ShopProductService {
     public ShopProduct getShopProductById(Long id) {
         return null;
     }
+
+    @Override
+    public List<ShopProduct> searchShopProducts(String name) {
+        return  this.shopProductRepository.findByProduct_NameContainingIgnoreCase(name);
+
+    }
 }

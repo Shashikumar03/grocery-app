@@ -38,7 +38,7 @@ public class PaymentServiceImp implements PaymentService {
         Order order = razorpay.getOrder();
 
         if ("CASH_ON_DELIVERY".equals(razorpay.getPaymentMode())) {
-            order.setOrderStatus("COMPLETED");
+            order.setOrderStatus(paymentStatus);
             razorpay.setOrder(order);
             order.setPayment(razorpay);
             this.orderRepository.save(order); // Save order changes

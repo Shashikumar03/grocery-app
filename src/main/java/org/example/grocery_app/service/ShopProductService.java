@@ -10,4 +10,6 @@ public interface ShopProductService {
     ShopProduct updateShopProduct(Long shopProductId, double price, boolean available, String unit);
     List<ShopProduct> getProductsByShopkeeper(Long shopkeeperId);
     ShopProduct getShopProductById(Long id);
+
+    List<ShopProduct> searchShopProducts(String name);
 }
