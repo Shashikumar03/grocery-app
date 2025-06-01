@@ -31,7 +31,7 @@ public class PaymentServiceImp implements PaymentService {
 
         log.info("razorpay :{}", razorpay);
 
-        if (!"COMPLETED".equals(paymentStatus) && !"PENDING".equals(paymentStatus) && !"FAILED".equals(paymentStatus)) {
+        if (!"COMPLETED".equals(paymentStatus) && !"PENDING".equals(paymentStatus) && !"FAILED".equals(paymentStatus) && !"CANCELLED".equals(paymentStatus)) {
             throw new ApiException("payment status should be COMPLETED, PENDING or FAILED");
         }
 
