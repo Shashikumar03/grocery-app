@@ -103,10 +103,14 @@ public class OrderServiceImplementation implements OrderService {
         DeliveryAddress deliveryAddress = this.deliveryAddressRepository.findByDeliveryAddressId(deliveryAddressId).orElseThrow(() -> new ResourceNotFoundException("Address", "Delivery Address Id", deliveryAddressId));
 
         validateCartItems(cart);
+        if(cart.getTotalPricesOfAllProduct()<50){
+            throw  new ApiException("Min order : Rs 50");
+        }
         log.info("Card validate successfully}");
 //        double discountAmount = cart.getDiscountAmount();
 //        handle the inventory also available or not
         Order order = initializeOrder(user, cart);
+
 
 //        Setting address of in the order
 //        order.setDiscountOnOrder(discountAmount);
