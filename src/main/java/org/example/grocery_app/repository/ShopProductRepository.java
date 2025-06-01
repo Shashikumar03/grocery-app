@@ -15,6 +15,9 @@ public interface ShopProductRepository extends JpaRepository<ShopProduct, Long> 
 
     Optional<ShopProduct> findByProductId(Long productId);
 
+    List<ShopProduct> findByProduct_NameContainingIgnoreCase(String name);
+
+
 
 
 }
