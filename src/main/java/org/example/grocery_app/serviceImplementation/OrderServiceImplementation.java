@@ -15,6 +15,7 @@ import org.example.grocery_app.exception.ApiException;
 import org.example.grocery_app.exception.ResourceNotFoundException;
 import org.example.grocery_app.repository.*;
 //import org.example.grocery_app.security.SecurityUtils;
+import org.example.grocery_app.service.EmailSenderService;
 import org.example.grocery_app.service.OrderService;
 import org.example.grocery_app.service.PaymentGatewayService;
 import org.example.grocery_app.util.CodeGenerator;
@@ -70,6 +71,9 @@ public class OrderServiceImplementation implements OrderService {
 
 //    @Autowired
 //    private SecurityUtils securityUtils;
+
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     @Autowired
     private PaymentGatewayService paymentGatewayService;
@@ -156,6 +160,7 @@ public class OrderServiceImplementation implements OrderService {
 
         completeUserCart(cart); //clearUserCart
         createNewActiveCart(user);
+        this.emailSenderService.sendSimpleEmail("shashikumarkushwaha3@gmail.com","Order placed by someone please check","Bazzario Order status");
 
         return  convertToOrderDto(savedOrder);
     }

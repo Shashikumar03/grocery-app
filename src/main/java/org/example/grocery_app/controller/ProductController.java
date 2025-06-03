@@ -44,5 +44,11 @@ public class ProductController {
         return ResponseEntity.ok(results);
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteById(@RequestParam Long productId){
+        this.productService.deleteProduct(productId);
+        return  new ResponseEntity<>("delete successfully", HttpStatus.OK);
+    }
+
 
 }
