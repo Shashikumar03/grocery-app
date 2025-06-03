@@ -169,6 +169,7 @@ public class OrderServiceImplementation implements OrderService {
 
     <table style="border: 1px solid #ccc; border-collapse: collapse;">
         <tr><td><strong>Order ID:</strong></td><td>%s</td></tr>
+          <tr><td><strong>User Mob:</strong></td><td>%s</td></tr>
         <tr><td><strong>Payment Mode:</strong></td><td>%s</td></tr>
         <tr><td><strong>Total Amount:</strong></td><td>₹%.2f</td></tr>
         <tr><td><strong>Delivery City:</strong></td><td>%s</td></tr>
@@ -181,6 +182,7 @@ public class OrderServiceImplementation implements OrderService {
 """.formatted(
                 user.getName(),
                 savedOrder.getId(),
+                user.getPhoneNumber(),
                 savedOrder.getPaymentMode(),
                 cart.getTotalPricesOfAllProduct(),
                 deliveryAddress.getCity(),
