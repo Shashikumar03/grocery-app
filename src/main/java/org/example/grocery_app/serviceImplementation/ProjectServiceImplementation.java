@@ -82,6 +82,11 @@ public class ProjectServiceImplementation implements ProductService {
         return products.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
+    @Override
+    public void deleteProduct(Long id) {
+        this.productRepository.deleteById(id);
+    }
+
     private ProductDto convertToDto(Product product) {
         ProductDto productDto = modalMapper.map(product, ProductDto.class);
         InventoryDto inventoryDto = modalMapper.map(product.getInventory(), InventoryDto.class);

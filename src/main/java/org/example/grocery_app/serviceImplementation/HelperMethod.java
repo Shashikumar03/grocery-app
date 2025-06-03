@@ -1,5 +1,6 @@
 package org.example.grocery_app.serviceImplementation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.grocery_app.dto.*;
 import org.example.grocery_app.entities.*;
 import org.modelmapper.ModelMapper;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class HelperMethod {
 
@@ -46,7 +48,9 @@ public class HelperMethod {
     public Set<ProductDto> changeProductEntitySetIntoProductDtoSet(Set<Product> productList) {
         return productList.stream()
                 .map(product -> {
+                    log.info("product info :{}", product);
                     ProductDto productDto = modelMapper.map(product, ProductDto.class);
+                    log.info("product dto :{}", productDto);
                     InventoryDto inventoryDto = this.modelMapper.map(product.getInventory(), InventoryDto.class);
                     productDto.setInventoryDto(inventoryDto);
                     return productDto;

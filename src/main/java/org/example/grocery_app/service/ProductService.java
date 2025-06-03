@@ -12,6 +12,9 @@ public interface ProductService {
 
     List<ProductDto> searchProducts(String name, String category, Double minPrice, Double maxPrice);
 
+    void  deleteProduct(Long id);
+
+
 
 
 }
