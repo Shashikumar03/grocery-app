@@ -94,6 +94,7 @@ public class PriceSettlementServiceImplementation implements PriceSettlementServ
         log.info("product of shashi :{}",productMap);
 
         List<PriceSettlement> priceSettlements = this.priceSettlementRepository.saveAll(priceSettlement);
+        log.info("price settlement statement :{}", priceSettlements);
         List<HisabBookDto> collect = priceSettlements.stream().map(priceSettlement1 -> {
             double payToShopKeeper = priceSettlement1.getPayToShopKeeper();
             double profit = priceSettlement1.getProfit();
@@ -102,6 +103,7 @@ public class PriceSettlementServiceImplementation implements PriceSettlementServ
             map.setPayToShopKeeper(payToShopKeeper);
             return  map;
         }).collect(Collectors.toList());
+
 
         // Build the PriceSettlementDto (assuming you have a suitable constructor or setters)
         return collect;
