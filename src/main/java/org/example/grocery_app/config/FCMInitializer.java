@@ -14,7 +14,7 @@ public class FCMInitializer {
     @PostConstruct
     public void initialize() {
         try {
-            InputStream serviceAccount = new ClassPathResource("src/main/resources/serviceAccountKey.json").getInputStream();
+            InputStream serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream();
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
