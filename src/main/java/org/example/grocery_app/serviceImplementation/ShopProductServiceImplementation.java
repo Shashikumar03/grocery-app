@@ -1,5 +1,6 @@
 package org.example.grocery_app.serviceImplementation;
 
+import org.example.grocery_app.entities.Inventory;
 import org.example.grocery_app.entities.Product;
 import org.example.grocery_app.entities.ShopProduct;
 import org.example.grocery_app.entities.Shopkeeper;
@@ -81,4 +82,44 @@ public class ShopProductServiceImplementation implements ShopProductService {
         return  this.shopProductRepository.findByProduct_NameContainingIgnoreCase(name);
 
     }
+
+    @Override
+    public ShopProduct updateShopProduct(Long shopProductId, ShopProduct updatedShopProduct) {
+        // Fetch existing ShopProduct by ID (throws if not found)
+        ShopProduct existingShopProduct = shopProductRepository.findById(shopProductId)
+                .orElseThrow(() -> new ResourceNotFoundException("ShopProduct", "id", shopProductId));
+
+        // Update ShopProduct fields
+        existingShopProduct.setSuggestedPrice(updatedShopProduct.getSuggestedPrice());
+        existingShopProduct.setAvailable(updatedShopProduct.isAvailable());
+//        existingShopProduct.setProductAssignedTime(updatedShopProduct.getProductAssignedTime());
+        existingShopProduct.setProductUpdatedTime(LocalDateTime.now());
+
+        // Update related Product entity
+        Product existingProduct = existingShopProduct.getProduct();
+        Product updatedProduct = updatedShopProduct.getProduct();
+
+        if (updatedProduct != null) {
+//            existingProduct.setName(updatedProduct.getName());
+//            existingProduct.setDescription(updatedProduct.getDescription());
+            existingProduct.setPrice(updatedProduct.getPrice());
+//            existingProduct.setImageUrl(updatedProduct.getImageUrl());
+            existingProduct.setAvailable(updatedProduct.isAvailable());
+//            existingProduct.setUnit(updatedProduct.getUnit());
+            // Note: You might want to handle category updates separately if needed
+        }
+
+        // Update Inventory entity
+        Inventory existingInventory = existingProduct.getInventory();
+        Inventory updatedInventory = updatedProduct != null ? updatedProduct.getInventory() : null;
+
+        if (existingInventory != null && updatedInventory != null) {
+            existingInventory.setStockQuantity(updatedInventory.getStockQuantity());
+            existingInventory.setReservedStock(updatedInventory.getReservedStock());
+        }
+
+        // Save the updated ShopProduct (cascade should save Product and Inventory if configured)
+        return shopProductRepository.save(existingShopProduct);
+    }
+
 }

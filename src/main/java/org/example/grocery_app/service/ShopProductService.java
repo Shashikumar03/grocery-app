@@ -12,4 +12,6 @@ public interface ShopProductService {
     ShopProduct getShopProductById(Long id);
 
     List<ShopProduct> searchShopProducts(String name);
+
+    public ShopProduct updateShopProduct(Long shopProductId, ShopProduct updatedShopProduct);
 }
