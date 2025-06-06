@@ -45,4 +45,10 @@ public class ShopProductController {
         List<ShopProduct> shopProducts = this.shopProductService.searchShopProducts(productName);
         return new ResponseEntity<>(shopProducts, HttpStatus.OK);
     }
+
+    @PutMapping("/update/{shopProductId}")
+    ResponseEntity<ShopProduct> updateShopProduct(@PathVariable Long shopProductId, @RequestBody ShopProduct shopProduct ){
+        ShopProduct shopProduct1 = this.shopProductService.updateShopProduct(shopProductId, shopProduct);
+        return  new ResponseEntity<>(shopProduct, HttpStatus.OK);
+    }
 }
