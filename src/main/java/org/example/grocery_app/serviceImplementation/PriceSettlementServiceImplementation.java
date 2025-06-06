@@ -54,13 +54,13 @@ public class PriceSettlementServiceImplementation implements PriceSettlementServ
                 .map(Order::getId)
                 .collect(Collectors.toList());
 
-        double totalPriceOfAllOrder = 0;
+        Double totalPriceOfAllOrder = 0.0;
 
         // Map to accumulate product summaries by product ID
         Map<Long, HisabBookDto> productMap = new HashMap<>();
 
         for (Order order : completedOrdersToday) {
-            double totalPaymentAmount = order.getPayment().getPaymentAmount();
+            Double totalPaymentAmount = order.getPayment().getPaymentAmount();
             totalPriceOfAllOrder += totalPaymentAmount;
 
             for (CartItem item : order.getCart().getCartItems()) {
@@ -72,47 +72,57 @@ public class PriceSettlementServiceImplementation implements PriceSettlementServ
                 existing.setProductName(product.getName());
                 existing.setProductPrice(product.getPrice());
                 existing.setProductQuantity(existing.getProductQuantity() + item.getQuantity());
-                existing.setTotalPrice(totalPaymentAmount);
+                existing.setTotalPrice(totalPaymentAmount); // Optional: consider accumulating instead
                 existing.setSettlementDate(LocalDateTime.now());
                 productMap.put(productId, existing);
             }
         }
 
-        // You can now collect the product list
-       log.info("product of shashi :{}",productMap);
+        log.info("product of shashi :{}", productMap);
 
-        for(Map.Entry<Long, HisabBookDto> hm :productMap.entrySet()){
-            ShopProduct shopProduct = this.shopProductRepository.findByProductId(hm.getKey()).orElseThrow(()-> new ResourceNotFoundException("a","a", hm.getKey()));
-            HisabBookDto hisab = hm.getValue();
-            hisab.setShopkeeperPrice(shopProduct.getSuggestedPrice());
-            hisab.setShopkeeperId(shopProduct.getShopkeeper().getId());
+        for (Map.Entry<Long, HisabBookDto> entry : productMap.entrySet()) {
+            Long productId = entry.getKey();
+            HisabBookDto hisab = entry.getValue();
 
+            ShopProduct shopProduct = shopProductRepository.findByProductId(productId)
+                    .orElseThrow(() -> new ResourceNotFoundException("ShopProduct", "productId", productId));
 
+            Double suggestedPrice = shopProduct.getSuggestedPrice();
+            if (suggestedPrice == null) {
+                suggestedPrice = 0.0;
+            }
+
+            hisab.setShopkeeperPrice(suggestedPrice);
+            if (shopProduct.getShopkeeper() != null) {
+                hisab.setShopkeeperId(shopProduct.getShopkeeper().getId());
+            } else {
+                log.warn("Shopkeeper not found for productId: {}", productId);
+                hisab.setShopkeeperId(null);
+            }
         }
-        List<HisabBookDto> hisabBookList = productMap.values().stream().collect(Collectors.toList());
-        List<PriceSettlement> priceSettlement = hisabBookList.stream().map(hisabBookDto -> this.modelMapper.map(hisabBookDto, PriceSettlement.class)).collect(Collectors.toList());
-        log.info("product of shashi :{}",productMap);
+
+        List<HisabBookDto> hisabBookList = new ArrayList<>(productMap.values());
+        List<PriceSettlement> priceSettlementEntities = hisabBookList.stream()
+                .map(dto -> modelMapper.map(dto, PriceSettlement.class))
+                .collect(Collectors.toList());
+
+        log.info("product of shashi :{}", productMap);
 
         try {
-            List<PriceSettlement> priceSettlements = this.priceSettlementRepository.saveAll(priceSettlement);
-            log.info("✅ Price settlements saved: {}", priceSettlements);
-            List<HisabBookDto> collect = priceSettlements.stream().map(priceSettlement1 -> {
-                double payToShopKeeper = priceSettlement1.getPayToShopKeeper();
-                double profit = priceSettlement1.getProfit();
-                HisabBookDto map = this.modelMapper.map(priceSettlement1, HisabBookDto.class);
-                map.setGetProfit(profit);
-                map.setPayToShopKeeper(payToShopKeeper);
-                return  map;
+            List<PriceSettlement> savedSettlements = priceSettlementRepository.saveAll(priceSettlementEntities);
+            log.info("✅ Price settlements saved: {}", savedSettlements);
+
+            return savedSettlements.stream().map(settlement -> {
+                HisabBookDto dto = modelMapper.map(settlement, HisabBookDto.class);
+                dto.setGetProfit(settlement.getProfit());
+                dto.setPayToShopKeeper(settlement.getPayToShopKeeper());
+                return dto;
             }).collect(Collectors.toList());
 
-
-            // Build the PriceSettlementDto (assuming you have a suitable constructor or setters)
-            return collect;
         } catch (Exception e) {
             log.error("❌ Failed to save price settlements", e);
-            return  null;
+            return null;
         }
-
     }
 
     @Override
