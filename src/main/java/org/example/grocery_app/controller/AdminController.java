@@ -6,6 +6,7 @@ import org.example.grocery_app.dto.OrderDetailsToAdminDto;
 import org.example.grocery_app.dto.OrderDto;
 import org.example.grocery_app.dto.PriceSettlementDto;
 import org.example.grocery_app.security.JwtHelper;
+import org.example.grocery_app.service.FirebaseStorageService;
 import org.example.grocery_app.service.OrderService;
 import org.example.grocery_app.service.PriceSettlementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class AdminController {
 
     @Autowired
     private PdfGenerator pdfGenerator;
+
+    @Autowired
+    private FirebaseStorageService firebaseStorageService;
 
     @PostMapping("/{paymentId}/confirm-return")
     public ResponseEntity<OrderDto> confirmGoodsReturnedAndInitiateRefund(@PathVariable Long paymentId) {
@@ -69,19 +73,25 @@ public class AdminController {
     @GetMapping("/pdf/{date}")
     public ResponseEntity<String> generatePdfReport(@PathVariable String date) {
         try {
-            LocalDate reportDate = LocalDate.parse(date); // "2025-05-28"
+            LocalDate reportDate = LocalDate.parse(date); // parse input date string
             List<HisabBookDto> settlements = priceSettlementService.getSettlementsByDate(reportDate);
             String outputPath = "PriceSettlement_" + date + ".pdf";
 
+            // Generate PDF locally
             pdfGenerator.generatePriceSettlementReport(reportDate, settlements, outputPath);
 
-            return ResponseEntity.ok("PDF generated: " + outputPath);
+            // Upload to Firebase Storage
+            String bucketName = "grocery-app-6fe52.appspot.com"; // your bucket name
+            String firebasePath = "reports/" + outputPath;
+
+            firebaseStorageService.uploadFile(outputPath, firebasePath, bucketName);
+
+            return ResponseEntity.ok("PDF generated and uploaded: " + firebasePath);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
-
-
     }
+
 
     @PostMapping("/mark-paid-to-shop-owner")
     public ResponseEntity<String> markAsPaidToShopkeeper(
