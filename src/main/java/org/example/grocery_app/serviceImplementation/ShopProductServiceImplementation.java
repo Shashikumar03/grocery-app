@@ -1,5 +1,6 @@
 package org.example.grocery_app.serviceImplementation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.grocery_app.entities.Inventory;
 import org.example.grocery_app.entities.Product;
 import org.example.grocery_app.entities.ShopProduct;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class ShopProductServiceImplementation implements ShopProductService {
 
@@ -104,11 +106,12 @@ public class ShopProductServiceImplementation implements ShopProductService {
 //            existingProduct.setDescription(updatedProduct.getDescription());
             existingProduct.setPrice(updatedProduct.getPrice());
 //            existingProduct.setImageUrl(updatedProduct.getImageUrl());
+            log.info("isAvailable :{}",updatedProduct.isAvailable());
             existingProduct.setAvailable(updatedProduct.isAvailable());
 //            existingProduct.setUnit(updatedProduct.getUnit());
             // Note: You might want to handle category updates separately if needed
         }
-            existingProduct.setAvailable(updatedProduct.isAvailable());
+//
 
 
         // Update Inventory entity
