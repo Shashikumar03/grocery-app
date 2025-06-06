@@ -93,20 +93,26 @@ public class PriceSettlementServiceImplementation implements PriceSettlementServ
         List<PriceSettlement> priceSettlement = hisabBookList.stream().map(hisabBookDto -> this.modelMapper.map(hisabBookDto, PriceSettlement.class)).collect(Collectors.toList());
         log.info("product of shashi :{}",productMap);
 
-        List<PriceSettlement> priceSettlements = this.priceSettlementRepository.saveAll(priceSettlement);
-        log.info("price settlement statement :{}", priceSettlements);
-        List<HisabBookDto> collect = priceSettlements.stream().map(priceSettlement1 -> {
-            double payToShopKeeper = priceSettlement1.getPayToShopKeeper();
-            double profit = priceSettlement1.getProfit();
-            HisabBookDto map = this.modelMapper.map(priceSettlement1, HisabBookDto.class);
-            map.setGetProfit(profit);
-            map.setPayToShopKeeper(payToShopKeeper);
-            return  map;
-        }).collect(Collectors.toList());
+        try {
+            List<PriceSettlement> priceSettlements = this.priceSettlementRepository.saveAll(priceSettlement);
+            log.info("✅ Price settlements saved: {}", priceSettlements);
+            List<HisabBookDto> collect = priceSettlements.stream().map(priceSettlement1 -> {
+                double payToShopKeeper = priceSettlement1.getPayToShopKeeper();
+                double profit = priceSettlement1.getProfit();
+                HisabBookDto map = this.modelMapper.map(priceSettlement1, HisabBookDto.class);
+                map.setGetProfit(profit);
+                map.setPayToShopKeeper(payToShopKeeper);
+                return  map;
+            }).collect(Collectors.toList());
 
 
-        // Build the PriceSettlementDto (assuming you have a suitable constructor or setters)
-        return collect;
+            // Build the PriceSettlementDto (assuming you have a suitable constructor or setters)
+            return collect;
+        } catch (Exception e) {
+            log.error("❌ Failed to save price settlements", e);
+            return  null;
+        }
+
     }
 
     @Override
