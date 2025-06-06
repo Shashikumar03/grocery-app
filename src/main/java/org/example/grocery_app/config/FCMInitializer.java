@@ -49,7 +49,7 @@ public class FCMInitializer {
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setStorageBucket("grocery-app-6fe52.appspot.com")
+                    .setStorageBucket("grocery-app-6fe52.appspot.co")
                     .build();
 
             if (FirebaseApp.getApps().isEmpty()) {
