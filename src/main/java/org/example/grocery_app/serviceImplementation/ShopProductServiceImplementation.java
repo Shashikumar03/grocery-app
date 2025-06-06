@@ -108,6 +108,8 @@ public class ShopProductServiceImplementation implements ShopProductService {
 //            existingProduct.setUnit(updatedProduct.getUnit());
             // Note: You might want to handle category updates separately if needed
         }
+            existingProduct.setAvailable(updatedProduct.isAvailable());
+
 
         // Update Inventory entity
         Inventory existingInventory = existingProduct.getInventory();
