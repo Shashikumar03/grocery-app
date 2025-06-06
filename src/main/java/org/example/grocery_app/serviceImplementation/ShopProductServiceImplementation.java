@@ -107,7 +107,7 @@ public class ShopProductServiceImplementation implements ShopProductService {
             existingProduct.setPrice(updatedProduct.getPrice());
 //            existingProduct.setImageUrl(updatedProduct.getImageUrl());
             log.info("isAvailable :{}",updatedProduct.isAvailable());
-            existingProduct.setAvailable(updatedProduct.isAvailable());
+            existingProduct.setAvailable(updatedShopProduct.isAvailable());
 //            existingProduct.setUnit(updatedProduct.getUnit());
             // Note: You might want to handle category updates separately if needed
         }
