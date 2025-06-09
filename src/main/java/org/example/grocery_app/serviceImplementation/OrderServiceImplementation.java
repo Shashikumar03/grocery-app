@@ -108,7 +108,7 @@ public class OrderServiceImplementation implements OrderService {
 
         validateCartItems(cart);
         if(cart.getTotalPricesOfAllProduct()<51){
-            throw  new ApiException("Min order : Rs 51");
+            throw  new ApiException("कृपया कम से कम ₹51 का ऑर्डर करें");
         }
         log.info("Card validate successfully}");
 //        double discountAmount = cart.getDiscountAmount();
@@ -192,8 +192,9 @@ public class OrderServiceImplementation implements OrderService {
         String[] recipients = {
                 "shashikumarkushwaha3@gmail.com",
                 "ry4715885@gmail.com",
-                "shashikumarkushwaha1@gmail.com",
-                user.getEmail()
+//                "shashikumarkushwaha1@gmail.com",
+                "naveensinghicici@gmail.com",
+                user.getEmail(),
         };
 //        String a="ry4715885@gmail.com";
         emailSenderService.sendSimpleEmail(
