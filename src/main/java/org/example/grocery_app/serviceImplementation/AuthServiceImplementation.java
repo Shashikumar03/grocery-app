@@ -56,30 +56,54 @@ public class AuthServiceImplementation implements AuthService {
 
     @Override
     public JwtResponse doLogin(String email, String password) {
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new ApiException("कृपया सही email ID दर्ज करें।: " + email)
-        );
+        try {
+            User user = userRepository.findByEmail(email).orElseThrow(
+                    () -> new ApiException("कृपया सही email ID दर्ज करें।: " + email)
+            );
 
-        this.doAuthenticate(email, password);
+            this.doAuthenticate(email, password);
 
-        // Load UserDetails
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            String token = this.helper.generateToken(user);
 
+            return JwtResponse.builder()
+                    .jwtToken(token)
+                    .user(user)
+                    .build();
 
-
-        String token = this.helper.generateToken(user);
-        Long idFromToken = this.helper.getIdFromToken(token);
-        System.out.println("id from the token: "+ idFromToken);
-
-
-        return JwtResponse.builder()
-                .jwtToken(token)
-//                .username(user.getUsername())   // user's username/email
-//                .role(user.getRole())            // user's role
-//                .id(user.getId())                // user's id
-                .user(user)
-                .build();
+        } catch (BadCredentialsException ex) {
+            throw new ApiException("Wrong Password !!");
+        }
     }
+
+
+
+//    @Override
+//    public JwtResponse doLogin(String email, String password) {
+//        User user = userRepository.findByEmail(email).orElseThrow(
+//                () -> new ApiException("कृपया सही email ID दर्ज करें।: " + email)
+//        );
+//
+//        this.doAuthenticate(email, password);
+//
+//        // Load UserDetails
+//        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+//
+//
+//
+//        String token = this.helper.generateToken(user);
+//        Long idFromToken = this.helper.getIdFromToken(token);
+//        System.out.println("id from the token: "+ idFromToken);
+//
+//
+//        return JwtResponse.builder()
+//                .jwtToken(token)
+////                .username(user.getUsername())   // user's username/email
+////                .role(user.getRole())            // user's role
+////                .id(user.getId())                // user's id
+//                .user(user)
+//                .build();
+//    }
 
     @Override
     public PasswordResetTokenDto requestResetPassword(String email) {
@@ -174,7 +198,7 @@ public class AuthServiceImplementation implements AuthService {
             manager.authenticate(authentication);
 
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException(" Wrong Password !!");
+            throw new BadCredentialsException("Wrong Password !!");
         }
     }
 
