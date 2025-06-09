@@ -46,11 +46,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        // You can customize the message based on the root cause
-        String message = "Database error: " + ex.getMostSpecificCause().getMessage();
+        String rootCauseMessage = ex.getMostSpecificCause().getMessage();
+        String message;
+
+        if (rootCauseMessage.contains("name")) {
+            message = "यह name पहले से उपयोग में है, कृपया कोई और नाम चुनें।";
+        } else if (rootCauseMessage.contains("email")) {
+            message = "यह email पहले से registered है। कृपया कोई और ईमेल आज़माएं।";
+        } else if (rootCauseMessage.contains("phone_number") || rootCauseMessage.contains("phoneNumber")) {
+            message = "यह फ़ोन नंबर पहले से पंजीकृत है। कृपया कोई और फ़ोन नंबर उपयोग करें।";
+        } else {
+            message = "डेटाबेस त्रुटि: कृपया मान्य जानकारी प्रदान करें।";
+        }
+
         ApiResponse apiResponse = new ApiResponse(message, false);
         return new ResponseEntity<>(apiResponse, HttpStatus.CONFLICT);
     }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Map<String, String>> handleConstraintViolation(ConstraintViolationException ex) {
         ex.getMessage();
