@@ -56,15 +56,16 @@ public class AuthServiceImplementation implements AuthService {
 
     @Override
     public JwtResponse doLogin(String email, String password) {
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new ApiException("कृपया सही email ID दर्ज करें।: " + email)
+        );
+
         this.doAuthenticate(email, password);
 
         // Load UserDetails
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
 
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new RuntimeException("User not found with email: " + email)
-        );
 
         String token = this.helper.generateToken(user);
         Long idFromToken = this.helper.getIdFromToken(token);
@@ -173,7 +174,7 @@ public class AuthServiceImplementation implements AuthService {
             manager.authenticate(authentication);
 
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Invalid Username or Password !!");
+            throw new BadCredentialsException(" Wrong Password !!");
         }
     }
 
