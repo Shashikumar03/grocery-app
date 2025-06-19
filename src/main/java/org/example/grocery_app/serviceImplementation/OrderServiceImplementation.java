@@ -107,8 +107,8 @@ public class OrderServiceImplementation implements OrderService {
         DeliveryAddress deliveryAddress = this.deliveryAddressRepository.findByDeliveryAddressId(deliveryAddressId).orElseThrow(() -> new ResourceNotFoundException("Address", "Delivery Address Id", deliveryAddressId));
 
         validateCartItems(cart);
-        if(cart.getTotalPricesOfAllProduct()<10){
-            throw  new ApiException("कृपया कम से कम ₹10 का ऑर्डर करें");
+        if(cart.getTotalPricesOfAllProduct()<51){
+            throw  new ApiException("कृपया कम से कम ₹51 का ऑर्डर करें");
         }
         log.info("Card validate successfully}");
 //        double discountAmount = cart.getDiscountAmount();
@@ -133,7 +133,7 @@ public class OrderServiceImplementation implements OrderService {
 
             payment = createRazorpayOrder(cart);  // Razorpay or any other gateway
             payment.setPaymentMode(PaymentMode.ONLINE.name());
-//            throw  new ApiException("online payment not accepting now");
+            throw  new ApiException("online payment not accepting now");
 //            payment.setPaymentStatus(PaymentStatus.PENDING); //
         } else if (paymentMode == PaymentMode.CASH_ON_DELIVERY) {
             payment = new Payment();
