@@ -1,4 +1,4 @@
-package org.example.grocery_app.service;
+package org.example.grocery_app.config;//package org.example.grocery_app.service;
 
 import com.google.firebase.cloud.StorageClient;
 import com.google.cloud.storage.Blob;
