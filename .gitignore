@@ -34,3 +34,4 @@ build/
 
 src/main/resources/serviceAccountKey.json
 #src/main/resources/serviceAccountKey.json
+env.properties
