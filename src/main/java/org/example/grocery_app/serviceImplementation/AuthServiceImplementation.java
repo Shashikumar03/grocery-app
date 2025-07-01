@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -194,10 +195,15 @@ public class AuthServiceImplementation implements AuthService {
     private void doAuthenticate(String email, String password) {
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, password);
+//        UsernamePasswordAuthenticationToken authentication =   new UsernamePasswordAuthenticationToken(email, null, user.getAuthorities());
+        log.info("authenticate email: {}, password: {}", authentication, password);
         try {
-            manager.authenticate(authentication);
+            Authentication authenticate = manager.authenticate(authentication);
+            log.info("authenticate checking: {}", "bypass security");
+
 
         } catch (BadCredentialsException e) {
+            log.info("Bad Credentials: {}", e.getMessage());
             throw new BadCredentialsException("Wrong Password !!");
         }
     }
