@@ -190,11 +190,11 @@ public class OrderServiceImplementation implements OrderService {
         );
         // Send email to the customer or admin
         String[] recipients = {
-                "shashikumarkushwaha3@gmail.com",
+                "shashikumarkushwaha1@gmail.com",
                 "ry4715885@gmail.com",
 //                "shashikumarkushwaha1@gmail.com",
-                "naveensinghicici@gmail.com",
-                user.getEmail(),
+//                "naveensinghicici@gmail.com",
+//                user.getEmail(),
         };
 //        String a="ry4715885@gmail.com";
         emailSenderService.sendSimpleEmail(
