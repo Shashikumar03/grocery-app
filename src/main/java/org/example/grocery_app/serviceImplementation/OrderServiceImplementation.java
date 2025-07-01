@@ -78,7 +78,8 @@ public class OrderServiceImplementation implements OrderService {
     @Autowired
     private PaymentGatewayService paymentGatewayService;
 
-    @Autowired ProductRepository productRepository;
+    @Autowired
+    ProductRepository productRepository;
 
     @PostConstruct
     public void initRazorpayClient() {
@@ -95,7 +96,7 @@ public class OrderServiceImplementation implements OrderService {
     public OrderDto createOrder(Long userId, Long deliveryAddressId, String paymentModeStr) {
 //        this.securityUtils.validateUserAccess(userId, request);
         User user = getUserById(userId);
-        log.info("User found successfully :{}",user);
+        log.info("User found successfully :{}", user);
         PaymentMode paymentMode;
         try {
             paymentMode = PaymentMode.valueOf(paymentModeStr.toUpperCase());
@@ -107,8 +108,8 @@ public class OrderServiceImplementation implements OrderService {
         DeliveryAddress deliveryAddress = this.deliveryAddressRepository.findByDeliveryAddressId(deliveryAddressId).orElseThrow(() -> new ResourceNotFoundException("Address", "Delivery Address Id", deliveryAddressId));
 
         validateCartItems(cart);
-        if(cart.getTotalPricesOfAllProduct()<100){
-            throw  new ApiException("कृपया कम से कम ₹100 का ऑर्डर करें");
+        if (cart.getTotalPricesOfAllProduct() < 100) {
+            throw new ApiException("कृपया कम से कम ₹100 का ऑर्डर करें");
         }
         log.info("Card validate successfully}");
 //        double discountAmount = cart.getDiscountAmount();
@@ -126,14 +127,14 @@ public class OrderServiceImplementation implements OrderService {
         order.setState(deliveryAddress.getState());
         order.setPaymentMode(paymentMode.name());
 
-        log.info("Order Created Successfully :{}",order);
+        log.info("Order Created Successfully :{}", order);
 
         Payment payment;
         if (paymentMode == PaymentMode.ONLINE) {
 
             payment = createRazorpayOrder(cart);  // Razorpay or any other gateway
             payment.setPaymentMode(PaymentMode.ONLINE.name());
-            throw  new ApiException("online payment not accepting now");
+            throw new ApiException("online payment not accepting now");
 //            payment.setPaymentStatus(PaymentStatus.PENDING); //
         } else if (paymentMode == PaymentMode.CASH_ON_DELIVERY) {
             payment = new Payment();
@@ -156,30 +157,30 @@ public class OrderServiceImplementation implements OrderService {
         log.info("Inventory update successfully");
 
         Order savedOrder = orderRepository.save(order);
-        log.info("order created successfully :{}",savedOrder);
+        log.info("order created successfully :{}", savedOrder);
 
         completeUserCart(cart); //clearUserCart
         createNewActiveCart(user);
 
         // Build HTML email body
         String htmlBody = """
-    <h2 style="color: #2e6c80;">🛒 Order Confirmation - Bazzario</h2>
-    <p>Hello <strong>%s</strong>,</p>
-    <p>Thank you for your order! Here are the details:</p>
-
-    <table style="border: 1px solid #ccc; border-collapse: collapse;">
-        <tr><td><strong>Order ID:</strong></td><td>%s</td></tr>
-          <tr><td><strong>User Mob:</strong></td><td>%s</td></tr>
-        <tr><td><strong>Payment Mode:</strong></td><td>%s</td></tr>
-        <tr><td><strong>Total Amount:</strong></td><td>₹%.2f</td></tr>
-        <tr><td><strong>Delivery City:</strong></td><td>%s</td></tr>
-        <tr><td><strong>Address:</strong></td><td>%s</td></tr>
-    </table>
-
-    <p style="margin-top: 16px;">📦 Your order will be delivered soon. We’ll notify you when it’s out for delivery.</p>
-
-    <p>Thanks for shopping with Bazzario!<br/>— Team Bazzario</p>
-""".formatted(
+                    <h2 style="color: #2e6c80;">🛒 Order Confirmation - Bazzario</h2>
+                    <p>Hello <strong>%s</strong>,</p>
+                    <p>Thank you for your order! Here are the details:</p>
+                
+                    <table style="border: 1px solid #ccc; border-collapse: collapse;">
+                        <tr><td><strong>Order ID:</strong></td><td>%s</td></tr>
+                          <tr><td><strong>User Mob:</strong></td><td>%s</td></tr>
+                        <tr><td><strong>Payment Mode:</strong></td><td>%s</td></tr>
+                        <tr><td><strong>Total Amount:</strong></td><td>₹%.2f</td></tr>
+                        <tr><td><strong>Delivery City:</strong></td><td>%s</td></tr>
+                        <tr><td><strong>Address:</strong></td><td>%s</td></tr>
+                    </table>
+                
+                    <p style="margin-top: 16px;">📦 Your order will be delivered soon. We’ll notify you when it’s out for delivery.</p>
+                
+                    <p>Thanks for shopping with Bazzario!<br/>— Team Bazzario</p>
+                """.formatted(
                 user.getName(),
                 savedOrder.getId(),
                 user.getPhoneNumber(),
@@ -206,7 +207,7 @@ public class OrderServiceImplementation implements OrderService {
 
 //        this.emailSenderService.sendSimpleEmail("shashikumarkushwaha3@gmail.com","Order placed by someone please check","Bazzario Order status");
 
-        return  convertToOrderDto(savedOrder);
+        return convertToOrderDto(savedOrder);
     }
 
     private User getUserById(Long userId) {
@@ -245,16 +246,16 @@ public class OrderServiceImplementation implements OrderService {
         orderRequest.put("currency", "INR");
         orderRequest.put("receipt", "receipt#1");
         JSONObject notes = new JSONObject();
-        notes.put("notes_key_1","Tea, Earl Grey, Hot");
-        notes.put("notes_key_1","Tea, Earl Grey, Hot");
-        orderRequest.put("notes",notes);
+        notes.put("notes_key_1", "Tea, Earl Grey, Hot");
+        notes.put("notes_key_1", "Tea, Earl Grey, Hot");
+        orderRequest.put("notes", notes);
 
         try {
             com.razorpay.Order razorpayOrder = razorpayClient.orders.create(orderRequest);
             payment.setRozerpayId(razorpayOrder.get("id"));
             payment.setPaymentStatus(razorpayOrder.get("status"));
             log.info("razorpay  order details");
-            log.info("razorpay order :{}",razorpayOrder);
+            log.info("razorpay order :{}", razorpayOrder);
 
         } catch (RazorpayException e) {
             log.error("Razorpay order creation failed: ", e);
@@ -283,16 +284,16 @@ public class OrderServiceImplementation implements OrderService {
         });
 
         List<Inventory> inventories = inventoryRepository.findAllById(inventoryIds);
-        log.info("all inventories that has to be update :{}",inventories);
+        log.info("all inventories that has to be update :{}", inventories);
 
         inventories.forEach(inventory -> {
             int updatedQuantity = inventory.getStockQuantity() - inventoryQuantityMap.get(inventory);
-            if(updatedQuantity<0){
+            if (updatedQuantity < 0) {
                 String name = inventory.getProduct().getName();
-                throw  new ApiException(name+":is out of stock, Available qty : "+inventory.getStockQuantity());
+                throw new ApiException(name + ":is out of stock, Available qty : " + inventory.getStockQuantity());
 
             }
-            if(updatedQuantity==0){
+            if (updatedQuantity == 0) {
                 inventory.getProduct().setAvailable(false);
 //                handle this
                 this.productRepository.save(inventory.getProduct());
@@ -302,7 +303,7 @@ public class OrderServiceImplementation implements OrderService {
             }
             inventory.setStockQuantity(updatedQuantity);
             Inventory save = inventoryRepository.save(inventory);
-            log.info("Inventory after updating  the items :{}",save);
+            log.info("Inventory after updating  the items :{}", save);
         });
     }
 
@@ -349,7 +350,6 @@ public class OrderServiceImplementation implements OrderService {
     }
 
 
-
 //@Override
 //public List<OrderDto> getOrderByUser(Long userId) {
 //    return List.of();
@@ -361,36 +361,36 @@ public class OrderServiceImplementation implements OrderService {
         User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
         List<Order> orderOfUser = this.orderRepository.findByUser(user);
         log.info("Order of the user : {}", orderOfUser);
-       return  orderOfUser.stream().map((order)->{
-           OrderDto orderDto = this.modelMapper.map(order, OrderDto.class);
-           Payment payment = order.getPayment();
-           if(payment!=null){
-               PaymentDto paymentDto = this.modelMapper.map(payment, PaymentDto.class);
-               orderDto.setPaymentDto(paymentDto);
-           }
-           Delivery delivery = order.getDelivery();
-           if (delivery != null) {
-               DeliveryDto deliveryDto = this.modelMapper.map(delivery, DeliveryDto.class);
-               orderDto.setDeliveryDto(deliveryDto);
-           }else {
-               throw  new ApiException("Delivery address cannot be null");
-           }
+        return orderOfUser.stream().map((order) -> {
+            OrderDto orderDto = this.modelMapper.map(order, OrderDto.class);
+            Payment payment = order.getPayment();
+            if (payment != null) {
+                PaymentDto paymentDto = this.modelMapper.map(payment, PaymentDto.class);
+                orderDto.setPaymentDto(paymentDto);
+            }
+            Delivery delivery = order.getDelivery();
+            if (delivery != null) {
+                DeliveryDto deliveryDto = this.modelMapper.map(delivery, DeliveryDto.class);
+                orderDto.setDeliveryDto(deliveryDto);
+            } else {
+                throw new ApiException("Delivery address cannot be null");
+            }
 
-           Cart cart = order.getCart();
+            Cart cart = order.getCart();
 //           if (cart != null) {
 //               CartDto cartDto = this.modelMapper.map(cart, CartDto.class);
 //               orderDto.setCartDto(cartDto);
 //           }
-           if (cart != null && cart.getCartItems() != null) {
-               Set<CartItemDto> cartItemDto = cart.getCartItems().stream()
-                       .map(cartItem -> this.modelMapper.map(cartItem, CartItemDto.class))
-                       .collect(Collectors.toSet());
+            if (cart != null && cart.getCartItems() != null) {
+                Set<CartItemDto> cartItemDto = cart.getCartItems().stream()
+                        .map(cartItem -> this.modelMapper.map(cartItem, CartItemDto.class))
+                        .collect(Collectors.toSet());
 
-               orderDto.setCartItemDto(cartItemDto);
-           }
+                orderDto.setCartItemDto(cartItemDto);
+            }
 
-           return orderDto;
-       }).collect(Collectors.toList());
+            return orderDto;
+        }).collect(Collectors.toList());
 
     }
 
@@ -468,9 +468,9 @@ public class OrderServiceImplementation implements OrderService {
             log.info("Refund of ₹{} scheduled for payment ID: {} (after 10% deduction)", refundAmount, payment.getRozerpayId());
         } else if (payment != null && Objects.equals(payment.getPaymentMode(), PaymentMode.CASH_ON_DELIVERY.name()) &&
                 ("PENDING".equalsIgnoreCase(payment.getPaymentStatus()) ||
-                        "CREATED".equalsIgnoreCase(payment.getPaymentStatus()))){
-            if(payment.getPaymentStatus()=="COMPLETED"){
-                throw  new ApiException("Item Delivered, Please refresh the Page");
+                        "CREATED".equalsIgnoreCase(payment.getPaymentStatus()))) {
+            if (payment.getPaymentStatus() == "COMPLETED") {
+                throw new ApiException("Item Delivered, Please refresh the Page");
             }
             double paymentAmount = payment.getPaymentAmount();
             double refundAmount = paymentAmount;
@@ -497,7 +497,7 @@ public class OrderServiceImplementation implements OrderService {
         Order order = orderRepository.findByPaymentId(orderId)
                 .orElseThrow(() -> {
                     log.error("Order not found for ID: {}", orderId);
-                    return new ResourceNotFoundException("Order", "orderId"+ orderId,0);
+                    return new ResourceNotFoundException("Order", "orderId" + orderId, 0);
                 });
 
         if (!"CANCELLED".equalsIgnoreCase(order.getOrderStatus())) {
@@ -528,12 +528,12 @@ public class OrderServiceImplementation implements OrderService {
             log.warn("Refund already initiated for payment ID: {}", payment.getRozerpayId());
             throw new ApiException("Refund already initiated.");
         }
-        if(Objects.equals(payment.getPaymentMode(), PaymentMode.ONLINE.name())){
+        if (Objects.equals(payment.getPaymentMode(), PaymentMode.ONLINE.name())) {
             String refundResponse = paymentGatewayService.initiatePartialRefund(payment.getPaymentId(), payment.getRefundAmount());
             log.info("Refund initiated: payment ID = {}, amount = {}, response = {}", payment.getRozerpayId(), payment.getRefundAmount(), refundResponse);
             payment.setPaymentNotes("Refund initiated by admin after goods return. It will take 2-5 working days to complete");
 
-        }else{
+        } else {
             double refundAmount = payment.getRefundAmount() * 0.90;
 //            int refundAmountInPaise = (int) (refundAmount * 100);
             payment.setRefundAmount(refundAmount);
@@ -560,7 +560,7 @@ public class OrderServiceImplementation implements OrderService {
 //        log.info("Fetching orders placed after: {}", oneMinuteAgo);
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay(); // today at 00:00
         LocalDateTime endOfDay = startOfDay.plusDays(1);
-        log.info("time :{}",startOfDay );
+        log.info("time :{}", startOfDay);
         log.info("end date :{}", endOfDay);
         // Fetch all unnotified orders placed in redisthe last minute
         List<Order> recentOrders = orderRepository.findByOrderTimeBetween(startOfDay, endOfDay);
