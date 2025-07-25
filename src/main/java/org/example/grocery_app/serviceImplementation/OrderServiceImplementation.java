@@ -259,7 +259,7 @@ public class OrderServiceImplementation implements OrderService {
 
         } catch (RazorpayException e) {
             log.error("Razorpay order creation failed: ", e);
-            throw new ApiException("Payment order creation failed. Please try again later.");
+            throw new ApiException("Payment order creation failed."+e.getMessage());
         }
 
         return payment;
