@@ -142,9 +142,9 @@ public class OrderServiceImplementation implements OrderService {
 //            throw new ApiException("online payment not accepting now");
             payment.setPaymentStatus("PENDING"); //
         } else if (paymentMode == PaymentMode.CASH_ON_DELIVERY) {
-            if(paymentMode == PaymentMode.CASH_ON_DELIVERY){
-                throw  new ApiException("केवल online payment स्वीकार किया जाता है");
-            }
+//            if(paymentMode == PaymentMode.CASH_ON_DELIVERY){
+//                throw  new ApiException("केवल online payment स्वीकार किया जाता है");
+//            }
             payment = new Payment();
             payment.setRozerpayId(CodeGenerator.generateCashCode());
             payment.setPaymentAmount(cart.getTotalPricesOfAllProduct()+deliveryFees.getDeliveryChargesOnCashOnDelivery());
