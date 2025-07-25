@@ -16,5 +16,7 @@ public class FeeTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long feeTableId;
 
-    private int deliveryCharges = 10;
+    private int deliveryChargesOnCashOnDelivery = 10;
+
+    private int deliveryChargesOnOnlineDelivery=0;
 }
