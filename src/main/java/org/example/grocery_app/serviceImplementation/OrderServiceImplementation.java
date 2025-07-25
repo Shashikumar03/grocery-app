@@ -16,6 +16,7 @@ import org.example.grocery_app.exception.ResourceNotFoundException;
 import org.example.grocery_app.repository.*;
 //import org.example.grocery_app.security.SecurityUtils;
 import org.example.grocery_app.service.EmailSenderService;
+import org.example.grocery_app.service.FeeService;
 import org.example.grocery_app.service.OrderService;
 import org.example.grocery_app.service.PaymentGatewayService;
 import org.example.grocery_app.util.CodeGenerator;
@@ -65,6 +66,9 @@ public class OrderServiceImplementation implements OrderService {
 
     @Autowired
     private HttpServletRequest request;
+
+    @Autowired
+    private FeeService feeService;
 //
 //    @Autowired
 //    private  PaymentGatewayService paymentGatewayService;
@@ -112,11 +116,12 @@ public class OrderServiceImplementation implements OrderService {
             throw new ApiException("कृपया कम से कम ₹10 का ऑर्डर करें");
         }
         log.info("Card validate successfully}");
+
 //        double discountAmount = cart.getDiscountAmount();
 //        handle the inventory also available or not
         Order order = initializeOrder(user, cart);
-
-
+        Long feeId=1L;
+        int deliveryFees = feeService.getDeliveryFees(feeId);
 //        Setting address of in the order
 //        order.setDiscountOnOrder(discountAmount);
         order.setAddress(deliveryAddress.getAddress());
@@ -139,7 +144,7 @@ public class OrderServiceImplementation implements OrderService {
         } else if (paymentMode == PaymentMode.CASH_ON_DELIVERY) {
             payment = new Payment();
             payment.setRozerpayId(CodeGenerator.generateCashCode());
-            payment.setPaymentAmount(cart.getTotalPricesOfAllProduct());
+            payment.setPaymentAmount(cart.getTotalPricesOfAllProduct()+deliveryFees);
             payment.setPaymentMode(PaymentMode.CASH_ON_DELIVERY.name());
             payment.setPaymentTime(LocalDateTime.now());
             payment.setPaymentStatus("created");
