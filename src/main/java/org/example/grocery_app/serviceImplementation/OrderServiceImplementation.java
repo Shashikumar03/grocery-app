@@ -121,7 +121,7 @@ public class OrderServiceImplementation implements OrderService {
 //        handle the inventory also available or not
         Order order = initializeOrder(user, cart);
         Long feeId=1L;
-        int deliveryFees = feeService.getDeliveryFees(feeId);
+        FeeTable deliveryFees = feeService.getDeliveryFees(feeId);
 //        Setting address of in the order
 //        order.setDiscountOnOrder(discountAmount);
         order.setAddress(deliveryAddress.getAddress());
@@ -144,7 +144,7 @@ public class OrderServiceImplementation implements OrderService {
         } else if (paymentMode == PaymentMode.CASH_ON_DELIVERY) {
             payment = new Payment();
             payment.setRozerpayId(CodeGenerator.generateCashCode());
-            payment.setPaymentAmount(cart.getTotalPricesOfAllProduct()+deliveryFees);
+            payment.setPaymentAmount(cart.getTotalPricesOfAllProduct()+deliveryFees.getDeliveryChargesOnCashOnDelivery());
             payment.setPaymentMode(PaymentMode.CASH_ON_DELIVERY.name());
             payment.setPaymentTime(LocalDateTime.now());
             payment.setPaymentStatus("created");
