@@ -40,12 +40,7 @@ public class FCMInitializer {
     @PostConstruct
     public void initialize() {
         try {
-            String serviceAccountJson = System.getenv("SERVICEACCOUNTKEY");
-            if (serviceAccountJson == null) {
-                throw new IllegalStateException("SERVICEACCOUNTKEY env variable not set");
-            }
-
-            InputStream serviceAccount = new ByteArrayInputStream(serviceAccountJson.getBytes(StandardCharsets.UTF_8));
+            InputStream serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream();
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -54,7 +49,7 @@ public class FCMInitializer {
 
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
-                System.out.println("✅ Firebase has been initialized from ENV.");
+                System.out.println("✅ Firebase initialized from file.");
             }
         } catch (Exception e) {
             System.err.println("❌ Failed to initialize FirebaseApp: " + e.getMessage());
