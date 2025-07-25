@@ -6,6 +6,7 @@ import org.aspectj.weaver.ast.Or;
 import org.example.grocery_app.dto.OrderDto;
 import org.example.grocery_app.entities.Order;
 import org.example.grocery_app.entities.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,7 +18,11 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUser(User user);
 
-//    Optional<Order> findById(Long orderId);
+    @Query("SELECT o FROM Order o WHERE o.user = :user ORDER BY o.orderTime DESC")
+    List<Order> findLatestOrdersByUser(@Param("user") User user, Pageable pageable);
+
+
+    //    Optional<Order> findById(Long orderId);
     Optional<Order> findByPaymentId(Long id);
 
     Optional<Order> findByPayment_RozerpayId(String rozerpayPaymentId);
