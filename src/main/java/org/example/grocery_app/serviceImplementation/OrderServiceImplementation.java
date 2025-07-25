@@ -445,15 +445,19 @@ public class OrderServiceImplementation implements OrderService {
 
         // Handle payment details and store refund context
         Payment payment = order.getPayment();
+
         if (payment != null && Objects.equals(payment.getPaymentMode(), PaymentMode.ONLINE.name()) &&
                 ("COMPLETED".equalsIgnoreCase(payment.getPaymentStatus()) ||
                         "CREATED".equalsIgnoreCase(payment.getPaymentStatus()))) {
+
+            log.info("payment details before refund initiate: {}", payment);
 //            ydi online payment nhi huya hai to refund kaise de skte hai
             if ("CREATED".equalsIgnoreCase(payment.getPaymentStatus())) {
                 log.warn("Payment not completed for payment ID: {}. Refund not allowed.", payment.getRozerpayId());
                 throw new ApiException("Payment has not been completed for payment ID: " + payment.getRozerpayId() + ", so unable to perform the refund.");
             }
 
+            log.info("Checking this is payment option :{}", payment.getPaymentStatus());
             double paymentAmount = payment.getPaymentAmount();
             double refundAmount = paymentAmount;
 
