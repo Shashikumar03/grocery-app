@@ -24,6 +24,8 @@ import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -367,11 +369,20 @@ public class OrderServiceImplementation implements OrderService {
     public List<OrderDto> getOrderByUser(Long userId) {
 
         User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
-        List<Order> orderOfUser = this.orderRepository.findByUser(user);
+//        List<Order> orderOfUser = this.orderRepository.findByUser(user);
+        Pageable top20 = PageRequest.of(0, 10);
+        List<Order> orderOfUser = orderRepository.findLatestOrdersByUser(user, top20);
         log.info("Order of the user : {}", orderOfUser);
         return orderOfUser.stream().map((order) -> {
             OrderDto orderDto = this.modelMapper.map(order, OrderDto.class);
             Payment payment = order.getPayment();
+            if (payment != null && PaymentMode.ONLINE.equals(payment.getPaymentMode())) {
+                String paymentStatus = payment.getPaymentStatus();
+                if(paymentStatus.toLowerCase().equals("pending")){
+                    payment.setPaymentStatus("Payment not completed");
+                }
+            }
+
             if (payment != null) {
                 PaymentDto paymentDto = this.modelMapper.map(payment, PaymentDto.class);
                 orderDto.setPaymentDto(paymentDto);
