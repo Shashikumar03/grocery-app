@@ -25,7 +25,10 @@ public class CustomUserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 //        Admin admin = this.adminRepository.findByAdminEmail(username).orElse(null);
-        org.example.grocery_app.entities.User user = this.userRepository.findByEmail(username).orElse(null);
+        org.example.grocery_app.entities.User user = this.userRepository.findByPhoneNumber(username).orElse(null);
+        if(user==null){
+            user = this.userRepository.findByEmail(username).orElse(null);
+        }
          if (user != null) {
             return User.withUsername(user.getEmail())
                     .password(user.getPassword())
