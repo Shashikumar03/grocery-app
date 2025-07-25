@@ -379,7 +379,7 @@ public class OrderServiceImplementation implements OrderService {
             if (payment != null && PaymentMode.ONLINE.equals(payment.getPaymentMode())) {
                 String paymentStatus = payment.getPaymentStatus();
                 if(paymentStatus.toLowerCase().equals("pending")){
-                    payment.setPaymentStatus("Payment not completed");
+                    payment.setPaymentStatus("ऑनलाइन payment पूरा नहीं हुआ है");
                 }
             }
 
