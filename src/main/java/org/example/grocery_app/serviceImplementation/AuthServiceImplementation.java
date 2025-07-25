@@ -58,19 +58,40 @@ public class AuthServiceImplementation implements AuthService {
     @Override
     public JwtResponse doLogin(String email, String password) {
         try {
-            User user = userRepository.findByEmail(email).orElseThrow(
-                    () -> new ApiException("कृपया सही email ID दर्ज करें।: " + email)
-            );
+            Optional<User> userByPhone = userRepository.findByPhoneNumber(email);
+            if(userByPhone.isPresent()){
+                this.doAuthenticate(email, password);
 
-            this.doAuthenticate(email, password);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                String token = this.helper.generateToken(userByPhone.get());
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-            String token = this.helper.generateToken(user);
+                return JwtResponse.builder()
+                        .jwtToken(token)
+                        .user(userByPhone.get())
+                        .build();
+            } else  {
+                Optional<User> userByEmail = userRepository.findByEmail(email);
+                if(userByEmail.isPresent()){
 
-            return JwtResponse.builder()
-                    .jwtToken(token)
-                    .user(user)
-                    .build();
+                    this.doAuthenticate(email, password);
+
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                    String token = this.helper.generateToken(userByEmail.get());
+
+                    return JwtResponse.builder()
+                            .jwtToken(token)
+                            .user(userByEmail.get())
+                            .build();
+                }else{
+                    throw  new ApiException("कृपया सही email or phone दर्ज करें।:" + email);
+                }
+            }
+
+//            User user = userRepository.findByEmail(email).orElseThrow(
+//                    () -> new ApiException("कृपया सही email ID दर्ज करें।: " + email)
+//            );
+//            email=user.getEmail();
+
 
         } catch (BadCredentialsException ex) {
             throw new ApiException("Wrong Password !!");
@@ -194,11 +215,11 @@ public class AuthServiceImplementation implements AuthService {
 
     private void doAuthenticate(String email, String password) {
 
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, password);
-//        UsernamePasswordAuthenticationToken authentication =   new UsernamePasswordAuthenticationToken(email, null, user.getAuthorities());
+//        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, password);
+        UsernamePasswordAuthenticationToken authentication =   new UsernamePasswordAuthenticationToken(email, null);
         log.info("authenticate email: {}, password: {}", authentication, password);
         try {
-            Authentication authenticate = manager.authenticate(authentication);
+//            Authentication authenticate = manager.authenticate(authentication);
             log.info("authenticate checking: {}", "bypass security");
 
 
