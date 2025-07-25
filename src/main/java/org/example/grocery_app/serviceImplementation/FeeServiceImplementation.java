@@ -21,9 +21,9 @@ public class FeeServiceImplementation implements FeeService {
     }
 
     @Override
-    public int getDeliveryFees(Long id) {
-        FeeTable feeTable = this.feeTableRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Feed", "FeeId", id));
-        return  feeTable.getDeliveryCharges();
+    public FeeTable getDeliveryFees(Long id) {
+        return  this.feeTableRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Feed", "FeeId", id));
+
 
 //        return  deliveryCharges;
     }
