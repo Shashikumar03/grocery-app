@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 //@EnableScheduling
 @EnableCaching
-public class GroceryAppApplication {
+public class  GroceryAppApplication {
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();

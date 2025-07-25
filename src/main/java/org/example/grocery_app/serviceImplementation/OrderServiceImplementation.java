@@ -134,8 +134,8 @@ public class OrderServiceImplementation implements OrderService {
 
             payment = createRazorpayOrder(cart);  // Razorpay or any other gateway
             payment.setPaymentMode(PaymentMode.ONLINE.name());
-            throw new ApiException("online payment not accepting now");
-//            payment.setPaymentStatus(PaymentStatus.PENDING); //
+//            throw new ApiException("online payment not accepting now");
+            payment.setPaymentStatus("PENDING"); //
         } else if (paymentMode == PaymentMode.CASH_ON_DELIVERY) {
             payment = new Payment();
             payment.setRozerpayId(CodeGenerator.generateCashCode());
