@@ -376,15 +376,13 @@ public class OrderServiceImplementation implements OrderService {
         return orderOfUser.stream().map((order) -> {
             OrderDto orderDto = this.modelMapper.map(order, OrderDto.class);
             Payment payment = order.getPayment();
-            if (payment != null && PaymentMode.ONLINE.equals(payment.getPaymentMode())) {
-                String paymentStatus = payment.getPaymentStatus();
-                if(paymentStatus.toLowerCase().equals("pending")){
-                    payment.setPaymentStatus("ऑनलाइन payment पूरा नहीं हुआ है");
-                }
-            }
-
             if (payment != null) {
                 PaymentDto paymentDto = this.modelMapper.map(payment, PaymentDto.class);
+
+                String paymentStatus = paymentDto.getPaymentStatus();
+                if(paymentStatus.equalsIgnoreCase("pending")){
+                    paymentDto.setPaymentStatus("ऑनलाइन payment पूरा नहीं हुआ है");
+                }
                 orderDto.setPaymentDto(paymentDto);
             }
             Delivery delivery = order.getDelivery();
