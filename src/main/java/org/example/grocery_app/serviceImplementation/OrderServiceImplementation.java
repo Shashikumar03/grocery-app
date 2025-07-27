@@ -114,8 +114,8 @@ public class OrderServiceImplementation implements OrderService {
         DeliveryAddress deliveryAddress = this.deliveryAddressRepository.findByDeliveryAddressId(deliveryAddressId).orElseThrow(() -> new ResourceNotFoundException("Address", "Delivery Address Id", deliveryAddressId));
 
         validateCartItems(cart);
-        if (cart.getTotalPricesOfAllProduct() < 9) {
-            throw new ApiException("कृपया कम से कम ₹10 का ऑर्डर करें");
+        if (cart.getTotalPricesOfAllProduct() < 100) {
+            throw new ApiException("कृपया कम से कम ₹100 का ऑर्डर करें");
         }
         log.info("Card validate successfully}");
 
