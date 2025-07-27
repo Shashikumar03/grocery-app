@@ -2,11 +2,12 @@ package org.example.grocery_app.serviceImplementation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.grocery_app.entities.Payment;
-import org.example.grocery_app.entities.WebhookEvent;
+import org.example.grocery_app.config.EmailContentGenerator;
+import org.example.grocery_app.entities.*;
 import org.example.grocery_app.exception.ResourceNotFoundException;
 import org.example.grocery_app.repository.PaymentRepository;
 import org.example.grocery_app.repository.WebhookEventRepository;
+import org.example.grocery_app.service.EmailSenderService;
 import org.example.grocery_app.service.RazorpayWebhookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +26,18 @@ public class RazorpayWebhookServiceImp implements RazorpayWebhookService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
+    private EmailContentGenerator emailContentGenerator;
+
+    @Autowired
+    private EmailSenderService emailService;
+
+    @Autowired
     private PaymentRepository paymentRepository;
 
     public RazorpayWebhookServiceImp(WebhookEventRepository webhookRepository) {
         this.webhookRepository = webhookRepository;
+
+
     }
 
     @Override
@@ -70,6 +79,15 @@ public class RazorpayWebhookServiceImp implements RazorpayWebhookService {
 
                 if ("payment.captured".equals(eventType)) {
                     payment.setPaymentStatus("COMPLETED");
+                    Order order = payment.getOrder();
+                    User user = order.getUser();
+
+                    String htmlBody = emailContentGenerator.generateOrderConfirmationEmail(user, order);
+                    String[] recipients = emailContentGenerator.getOrderConfirmationRecipients();
+                    emailService.sendSimpleEmail(recipients, "Order Confirmation - Bazzario", htmlBody);
+                    logger.info("📧 Order confirmation email sent to recipients for Order ID: {}", order.getId());
+
+
                 } else {
                     payment.setPaymentStatus("FAILED");
                 }

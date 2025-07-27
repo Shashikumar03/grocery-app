@@ -114,8 +114,8 @@ public class OrderServiceImplementation implements OrderService {
         DeliveryAddress deliveryAddress = this.deliveryAddressRepository.findByDeliveryAddressId(deliveryAddressId).orElseThrow(() -> new ResourceNotFoundException("Address", "Delivery Address Id", deliveryAddressId));
 
         validateCartItems(cart);
-        if (cart.getTotalPricesOfAllProduct() < 101) {
-            throw new ApiException("कृपया कम से कम ₹101 का ऑर्डर करें");
+        if (cart.getTotalPricesOfAllProduct() < 9) {
+            throw new ApiException("कृपया कम से कम ₹10 का ऑर्डर करें");
         }
         log.info("Card validate successfully}");
 
@@ -208,11 +208,15 @@ public class OrderServiceImplementation implements OrderService {
 //                user.getEmail(),
         };
 //        String a="ry4715885@gmail.com";
-        emailSenderService.sendSimpleEmail(
-                recipients,
-                htmlBody,
-                "🧾 Order Confirmation - Bazzario"
-        );
+
+        if(paymentMode==PaymentMode.CASH_ON_DELIVERY){
+            emailSenderService.sendSimpleEmail(
+                    recipients,
+                    htmlBody,
+                    "🧾 Order Confirmation - Bazzario"
+            );
+        }
+
 
 
 //        this.emailSenderService.sendSimpleEmail("shashikumarkushwaha3@gmail.com","Order placed by someone please check","Bazzario Order status");
