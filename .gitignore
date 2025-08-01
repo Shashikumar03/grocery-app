@@ -34,6 +34,6 @@ build/
 
 # Ignore sensitive files
 src/main/resources/serviceAccountKey.json
-env.properties
+/env.properties
 src/main/resources/env.properties
 src/main/resources/env-2.properties
