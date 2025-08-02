@@ -24,7 +24,7 @@ public class TwilioSmsController {
     }
 
 
-    // ✅ Send SMS to all hardcoded numbers
+//    // ✅ Send SMS to all hardcoded numbers
 //    @GetMapping("/send/all")
 //    public String sendSmsToAll(@RequestParam String message) {
 //        StringBuilder report = new StringBuilder();
