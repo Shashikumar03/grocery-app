@@ -114,7 +114,7 @@ public class OrderServiceImplementation implements OrderService {
         DeliveryAddress deliveryAddress = this.deliveryAddressRepository.findByDeliveryAddressId(deliveryAddressId).orElseThrow(() -> new ResourceNotFoundException("Address", "Delivery Address Id", deliveryAddressId));
 
         validateCartItems(cart);
-        if (cart.getTotalPricesOfAllProduct() < 100) {
+        if (cart.getTotalPricesOfAllProduct() < 1) {
             throw new ApiException("कृपया कम से कम ₹100 का ऑर्डर करें");
         }
         log.info("Card validate successfully}");
@@ -139,10 +139,10 @@ public class OrderServiceImplementation implements OrderService {
         Payment payment;
         if (paymentMode == PaymentMode.ONLINE) {
 
-            payment = createRazorpayOrder(cart);  // Razorpay or any other gateway
+            payment = createRazorpayOrder(cart,deliveryFees.getDeliveryChargesOnOnlineDelivery());  // Razorpay or any other gateway
             payment.setPaymentMode(PaymentMode.ONLINE.name());
-           throw new ApiException("online payment not accepting now");
-            // payment.setPaymentStatus("PENDING"); //
+//           throw new ApiException("online payment not accepting now");
+             payment.setPaymentStatus("PENDING"); //
         } else if (paymentMode == PaymentMode.CASH_ON_DELIVERY) {
 //            if(paymentMode == PaymentMode.CASH_ON_DELIVERY){
 //                throw  new ApiException("केवल online payment स्वीकार किया जाता है");
@@ -249,14 +249,16 @@ public class OrderServiceImplementation implements OrderService {
         return order;
     }
 
-    private Payment createRazorpayOrder(Cart cart) {
+    private Payment createRazorpayOrder(Cart cart, int deliveryFees) {
         Payment payment = new Payment();
         payment.setPaymentTime(LocalDateTime.now());
         payment.setPaymentMode("ONLINE");
-        payment.setPaymentAmount(cart.getTotalPricesOfAllProduct());
+        log.info("onlinepayment delivery fees : {}", deliveryFees);
+        double totalAmount=cart.getTotalPricesOfAllProduct()+deliveryFees;
+        payment.setPaymentAmount(totalAmount);
 
         JSONObject orderRequest = new JSONObject();
-        orderRequest.put("amount", cart.getTotalPricesOfAllProduct() * 100); // Convert to paise
+        orderRequest.put("amount", totalAmount * 100); // Convert to paise
         orderRequest.put("currency", "INR");
         orderRequest.put("receipt", "receipt#1");
         JSONObject notes = new JSONObject();

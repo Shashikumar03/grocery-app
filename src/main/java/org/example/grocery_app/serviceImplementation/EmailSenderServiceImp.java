@@ -30,7 +30,8 @@ public class EmailSenderServiceImp implements EmailSenderService {
 
             mailSender.send(mimeMessage);
         } catch (Exception e) {
-            throw new ApiException("Invalid email format: " + e.getMessage());
+            System.out.println("shashi");
+//            throw new ApiException("Invalid email format: " + e.getMessage());
         }
     }
 
