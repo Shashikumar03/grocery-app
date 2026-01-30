@@ -33,9 +33,10 @@ build/
 .vscode/
 
 # Ignore sensitive files
-src/main/resources/serviceAccountKey.json
+/src/main/resources/serviceAccountKey.json
 /env.properties
 src/main/resources/env.properties
 src/main/resources/env-2.properties
 /serviceAccountKey.json
 env.properties
+serviceAccountKey.json
