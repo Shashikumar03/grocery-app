@@ -209,13 +209,13 @@ public class OrderServiceImplementation implements OrderService {
 //         };
 //        String a="ry4715885@gmail.com";
 
-        if(paymentMode==PaymentMode.CASH_ON_DELIVERY){
-            emailSenderService.sendSimpleEmail(
-                    recipients,
-                    htmlBody,
-                    "🧾 Order Confirmation - Bazzario"
-            );
-        }
+        // if(paymentMode==PaymentMode.CASH_ON_DELIVERY){
+        //     emailSenderService.sendSimpleEmail(
+        //             recipients,
+        //             htmlBody,
+        //             "🧾 Order Confirmation - Bazzario"
+        //     );
+        // }
 
 
 
