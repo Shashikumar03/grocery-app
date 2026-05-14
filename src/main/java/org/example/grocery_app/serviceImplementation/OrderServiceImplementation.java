@@ -200,13 +200,13 @@ public class OrderServiceImplementation implements OrderService {
                 deliveryAddress.getAddress()
         );
         // Send email to the customer or admin
-        String[] recipients = {
-                "shashikumarkushwaha1@gmail.com",
-                "ry4715885@gmail.com",
-//                "shashikumarkushwaha1@gmail.com",
-//                "naveensinghicici@gmail.com",
-//                user.getEmail(),
-        };
+//         String[] recipients = {
+//                 "shashikumarkushwaha1@gmail.com",
+//                 "ry4715885@gmail.com",
+// //                "shashikumarkushwaha1@gmail.com",
+// //                "naveensinghicici@gmail.com",
+// //                user.getEmail(),
+//         };
 //        String a="ry4715885@gmail.com";
 
         if(paymentMode==PaymentMode.CASH_ON_DELIVERY){
