@@ -3,11 +3,13 @@ package org.example.grocery_app.serviceImplementation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.grocery_app.config.EmailContentGenerator;
+import org.example.grocery_app.dto.PaymentDto;
 import org.example.grocery_app.entities.*;
 import org.example.grocery_app.exception.ResourceNotFoundException;
 import org.example.grocery_app.repository.PaymentRepository;
 import org.example.grocery_app.repository.WebhookEventRepository;
 import org.example.grocery_app.service.EmailSenderService;
+import org.example.grocery_app.service.PaymentService;
 import org.example.grocery_app.service.RazorpayWebhookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,9 @@ public class RazorpayWebhookServiceImp implements RazorpayWebhookService {
 
     @Autowired
     private PaymentRepository paymentRepository;
+
+    @Autowired
+    private PaymentService paymentService;
 
     public RazorpayWebhookServiceImp(WebhookEventRepository webhookRepository) {
         this.webhookRepository = webhookRepository;
@@ -70,30 +75,22 @@ public class RazorpayWebhookServiceImp implements RazorpayWebhookService {
                 String paymentId = rootNode.path("payload").path("payment").path("entity").path("id").asText();
                 double amount = rootNode.path("payload").path("payment").path("entity").path("amount").asDouble() / 100.0;
 
-                Payment payment = paymentRepository.findByRozerpayId(razorpayOrderId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Payment", "razorpayId", 0));
-
-                payment.setPaymentId(paymentId);
-                payment.setPaymentAmount(amount);
-                payment.setPaymentTime(LocalDateTime.now());
-
                 if ("payment.captured".equals(eventType)) {
-                    payment.setPaymentStatus("COMPLETED");
-                    Order order = payment.getOrder();
+                    PaymentDto updated = paymentService.captureOnlinePaymentFromWebhook(razorpayOrderId, paymentId, amount);
+                    Order order = paymentRepository.findByRozerpayId(razorpayOrderId)
+                            .orElseThrow(() -> new ResourceNotFoundException("Payment", "razorpayId", 0))
+                            .getOrder();
                     User user = order.getUser();
 
                     String htmlBody = emailContentGenerator.generateOrderConfirmationEmail(user, order);
                     String[] recipients = emailContentGenerator.getOrderConfirmationRecipients();
                     emailService.sendSimpleEmail(recipients, "Order Confirmation - Bazzario", htmlBody);
-                    logger.info("📧 Order confirmation email sent to recipients for Order ID: {}", order.getId());
-
-
+                    logger.info("📧 Order confirmation email sent for Order ID: {}", order.getId());
+                    logger.info("💳 Payment captured via webhook: {}", updated.getId());
                 } else {
-                    payment.setPaymentStatus("FAILED");
+                    paymentService.failOnlinePaymentFromWebhook(razorpayOrderId, paymentId);
+                    logger.info("💳 Payment failed via webhook for razorpay order: {}", razorpayOrderId);
                 }
-
-                paymentRepository.save(payment);
-                logger.info("💳 Payment updated: {}", payment.getId());
             }
 
             // Handle Refund Events

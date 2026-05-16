@@ -90,7 +90,7 @@ public class OrderServiceImplementation implements OrderService {
     @PostConstruct
     public void initRazorpayClient() {
         try {
-            this.razorpayClient = new RazorpayClient("rzp_live_UDn0rqtiftjbPd", "78IeWxDMwC8M6C8YUffofuKh");
+            this.razorpayClient = new RazorpayClient(razorpayKey, razorpaySecretKey);
         } catch (RazorpayException e) {
             log.error("Failed to initialize Razorpay Client", e);
             throw new RuntimeException("Razorpay client initialization failed.");

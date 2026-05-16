@@ -22,7 +22,7 @@ public class PaymentGatewayServiceImp implements PaymentGatewayService {
     @Override
     public String initiatePartialRefund(String paymentId, double totalAmount) {
         try {
-            RazorpayClient client = new RazorpayClient("rzp_live_UDn0rqtiftjbPd", "78IeWxDMwC8M6C8YUffofuKh");
+            RazorpayClient client = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
 
             double refundAmount = totalAmount * 1;
             int refundAmountInPaise = (int) (refundAmount * 100);
