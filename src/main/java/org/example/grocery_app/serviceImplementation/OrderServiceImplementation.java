@@ -610,7 +610,10 @@ public class OrderServiceImplementation implements OrderService {
 
             UserDto userDto = modelMapper.map(user, UserDto.class);
             List<OrderDto> orderDtos = orders.stream()
-                    .filter(order -> "PENDING".equalsIgnoreCase(order.getOrderStatus()))
+                    .filter(order -> {
+                        String status = order.getOrderStatus();
+                        return "PENDING".equalsIgnoreCase(status) || "CONFIRMED".equalsIgnoreCase(status);
+                    })
                     .filter(order -> !"created".equalsIgnoreCase(order.getPayment().getPaymentStatus()) || "CASH_ON_DELIVERY".equalsIgnoreCase(order.getPayment().getPaymentMode()) && "created".equalsIgnoreCase(order.getPayment().getPaymentStatus()))
                     .map(this::convertToOrderDto)
                     .collect(Collectors.toList());
