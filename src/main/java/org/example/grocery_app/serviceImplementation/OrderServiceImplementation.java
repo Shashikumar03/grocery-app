@@ -585,12 +585,12 @@ public class OrderServiceImplementation implements OrderService {
 //        LocalDateTime oneMinuteAgo = LocalDateTime.now().minusMinutes(100);
 //        log.info("time :{}", oneMinuteAgo);
 //        log.info("Fetching orders placed after: {}", oneMinuteAgo);
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay(); // today at 00:00
-        LocalDateTime endOfDay = startOfDay.plusDays(1);
-        log.info("time :{}", startOfDay);
-        log.info("end date :{}", endOfDay);
-        // Fetch all unnotified orders placed in redisthe last minute
-        List<Order> recentOrders = orderRepository.findByOrderTimeBetween(startOfDay, endOfDay);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime last24Hours = now.minusHours(24);
+        LocalDateTime from = startOfDay.isBefore(last24Hours) ? startOfDay : last24Hours;
+        log.info("Fetching orders from {} to {}", from, now);
+        List<Order> recentOrders = orderRepository.findByOrderTimeBetween(from, now);
         log.info("recent orders are :{}", recentOrders);
         // Mark as notified
 //        for (Order order : recentOrders) {
@@ -611,10 +611,17 @@ public class OrderServiceImplementation implements OrderService {
             UserDto userDto = modelMapper.map(user, UserDto.class);
             List<OrderDto> orderDtos = orders.stream()
                     .filter(order -> {
-                        String status = order.getOrderStatus();
-                        return "PENDING".equalsIgnoreCase(status) || "CONFIRMED".equalsIgnoreCase(status);
+                        if ("CONFIRMED".equalsIgnoreCase(order.getOrderStatus())) {
+                            return true;
+                        }
+                        if ("PENDING".equalsIgnoreCase(order.getOrderStatus())) {
+                            Payment payment = order.getPayment();
+                            return !"created".equalsIgnoreCase(payment.getPaymentStatus())
+                                    || PaymentMode.CASH_ON_DELIVERY.name().equalsIgnoreCase(payment.getPaymentMode())
+                                    && "created".equalsIgnoreCase(payment.getPaymentStatus());
+                        }
+                        return false;
                     })
-                    .filter(order -> !"created".equalsIgnoreCase(order.getPayment().getPaymentStatus()) || "CASH_ON_DELIVERY".equalsIgnoreCase(order.getPayment().getPaymentMode()) && "created".equalsIgnoreCase(order.getPayment().getPaymentStatus()))
                     .map(this::convertToOrderDto)
                     .collect(Collectors.toList());
 
